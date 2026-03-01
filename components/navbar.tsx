@@ -51,7 +51,7 @@ function NavLink({ href, label, active }: { href: string, label: string, active:
   return (
     <Link
       href={href}
-      className={"flex items-center text-md font-bold transition-colors text-black hover:underline underline-offset-4"}
+      className={"flex items-center text-md font-bold transition-colors text-black hover:underline hover:underline-offset-4 hover:text-[#6B9FBE]"}
     >
       {label}
     </Link>
