@@ -1,17 +1,7 @@
-import { createClient } from '@/utils/supabase/server'
-import { cookies } from 'next/headers'
+import Link from 'next/link'
 
-export default async function Page() {
-  const cookieStore = await cookies()
-  const supabase = createClient(cookieStore)
+{/* <Link href="/login">Go to Tasks</Link> */}
 
-  const { data: todos } = await supabase.from('todos').select()
-
-  return (
-    <ul>
-      {todos?.map((todo) => (
-        <li>{todo.task}</li>
-      ))}
-    </ul>
-  )
+export default function Home() {
+  return <div><u><Link href="/login">Register</Link></u></div>
 }
