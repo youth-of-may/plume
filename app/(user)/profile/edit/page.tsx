@@ -2,55 +2,56 @@
 import { createClient } from '@/utils/supabase/client';
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { fetchUser } from './profile';
 import Link from 'next/link';
 
 export default function EditProfile() {
-
     const [name, setName] = useState('');
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
-    const supabase = createClient();
-    const router = useRouter();
+    const [userId, setUserId] = useState<string | null>(null);
 
-    async function fetchUser() {
-        const { data: { user } } = await supabase.auth.getUser();
-        const { data, error } = await supabase
-            .from('profile')
-            .select('name, username')
-            .eq('user_id', user.id)
-            .single();
-        console.log(data);
-    }
+    const router = useRouter();
+    const supabase = createClient();
 
     useEffect(() => {
-        fetchUser();
+        async function loadProfile() {
+            const result = await fetchUser();
+            if (!result) return;
+            setUserId(result.user.id);
+            setEmail(result.user.email ?? '');
+            setName(result.profile.name);
+            setUsername(result.profile.username);
+        }
+        loadProfile();
     }, []);
+
     async function editProfile() {
         const { data, error } = await supabase.auth.updateUser({
             email: email,
         });
 
+
         if (error) {
             console.error('Edit error:', error.message);
             return;
         }
-        if (data.user) {
-            const { error: profileError } = await supabase.from('profile').update({
-                username: username,
-                name: name,
-            }).eq('user_id', 'data.user.id');
+
+        if (userId) {
+            const { error: profileError } = await supabase
+                .from('profile')
+                .update({
+                    username: username,
+                    name: name,
+                })
+                .eq('user_id', userId);
+
             if (profileError) {
-                console.error('Profile creation error:', profileError.message);
+                console.error('Profile update error:', profileError.message);
                 return;
             }
         }
 
-
-
-
-        if (data.user) {
-
-        }
         router.push('/');
         console.log('Successfully edited user', data.user);
     }
@@ -90,7 +91,7 @@ export default function EditProfile() {
                 <div className="flex place-content-between w-1/1 py-4">
                     <label htmlFor="email" className="block font-delius text-xl/6 font-bold text-[#2E2805] basis-1/3">E-mail</label>
                     <div className="rounded-t-md bg-white opacity-70 px-3 py-1 basis-2/3 border-b-3 border-[#CCC38D] focus-within:border-[#F0B6CF]">
-                        <input id="email" type="email" name="email" placeholder="enter new e-mail"
+                        <input id="email" type="email" name="email" placeholder="enter new e-mail" value={email}
                             onChange={(e) => setEmail(e.target.value)} required
                             className="block font-delius min-w-0 grow bg-transparent py-1.5 pr-3 pl-1 text-base text-[#2E2805] placeholder:text-[#CCC38D] focus:outline-none sm:text-sm/6" />
                     </div>
