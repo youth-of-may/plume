@@ -4,9 +4,9 @@ import { cookies } from 'next/headers'
 export default async function Page() {
 
 
-  return (
-    <ul>
-      Test
-    </ul>
-  )
+    return (
+        <ul>
+            Profile View
+        </ul>
+    )
 }
