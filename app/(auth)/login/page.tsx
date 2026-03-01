@@ -65,7 +65,7 @@ export default function Login() {
                 {/* buttons */}
                 <div className="grid grid-rows-2 p-4 gap-2.5">
                     <button type="submit" className="font-delius rounded-2xl bg-[#ADD3EA] px-23 py-2 text-sm font-semibold text-[#524601]">Login</button>
-                    <button type="button" className="font-delius rounded-2xl text-sm/6 bg-[#F0B6CF] px-23 py-2 font-semibold text-[#524601]">Reset Password</button>
+                    <button type="button" className="font-delius rounded-2xl text-sm/6 bg-[#F0B6CF] px-23 py-2 font-semibold text-[#524601]">Create Account</button>
                 </div>
             </form>
         </div>
