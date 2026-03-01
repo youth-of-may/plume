@@ -43,6 +43,22 @@ export default function FilterButtons({ currentFilter }: FilterButtonsProps) {
       >
         All
       </button>
+      <button 
+        onClick={() => setFilter('complete')}
+        className={`font-delius p-4 rounded-xl font-bold ${
+          currentFilter === 'complete' ? 'bg-[#7AB8D6]' : 'bg-[#ADD3EA]'
+        }`}
+      >
+        Completed Tasks
+      </button>
+      <button 
+        onClick={() => setFilter('pending')}
+        className={`font-delius p-4 rounded-xl font-bold ${
+          currentFilter === 'pending' ? 'bg-[#7AB8D6]' : 'bg-[#ADD3EA]'
+        }`}
+      >
+        Pending Tasks
+      </button>
     </div>
   )
 }
