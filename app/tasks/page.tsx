@@ -1,6 +1,20 @@
 import { createClient } from '@/utils/supabase/server'
 import { cookies } from 'next/headers'
 import TaskListClient from "./tasklistclient"
+import FilterButtons from "./filterbuttons"
+
+type TaskWithDifficulty = {
+  id: string
+  is_complete: boolean
+  completion_datetime: string | null
+  task_deadline: string | null
+  created_at: string
+  task_difficulty: string
+  difficulty?: {
+    difficulty_name: string
+    difficulty_expamount: number
+  } | null
+}
 
 function calculateExpPoints(tasks: TaskWithDifficulty[]) {
   let total = 0
@@ -37,48 +51,73 @@ function calculateExpPoints(tasks: TaskWithDifficulty[]) {
 }
 
 
-export default async function Page() {
+export default async function Page({ 
+  searchParams 
+}: { 
+  searchParams: Promise<{ filter?: string }>
+}) {
   const cookieStore = await cookies()
   const supabase = createClient(cookieStore)
+  const { filter } = await searchParams
 
-    const { data: tasks } = await supabase.from('task').select('*')
-    const { data: difficulties } = await supabase.from('difficulty').select('*')
+  const now = new Date()
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  const endOfToday = new Date(startOfToday.getTime() + 24 * 60 * 60 * 1000)
+  const endOfWeek = new Date(startOfToday.getTime() + 7 * 24 * 60 * 60 * 1000)
 
-    const completedTasks = tasks.filter(task => task.is_complete)
-    const pendingTasks = tasks.filter(task => !task.is_complete)
+  let query = supabase.from('task').select('*')
 
-    const tasksWithDifficulty = completedTasks?.map(task => ({
+  if (filter === 'daily') {
+    query = query
+      .gte('task_deadline', startOfToday.toISOString())  // WHERE deadline >= start_of_today
+      .lt('task_deadline', endOfToday.toISOString())     // AND deadline < end_of_today
+  } else if (filter === 'week') {
+    query = query
+      .gte('task_deadline', startOfToday.toISOString())  // WHERE deadline >= start_of_today
+      .lt('task_deadline', endOfWeek.toISOString())      // AND deadline < end_of_week
+  }
+
+  const { data: tasks } = await query
+  const { data: difficulties } = await supabase.from('difficulty').select('*')
+  const completedTasks = (tasks ?? []).filter(task => task.is_complete)
+  const pendingTasks = (tasks ?? []).filter(task => !task.is_complete)
+
+  const tasksWithDifficulty = completedTasks?.map(task => ({
     ...task,
     difficulty: difficulties?.find(d => d.difficulty_name === task.task_difficulty)
-    }))
+  }))
 
-    const expPoints = calculateExpPoints(tasksWithDifficulty)
+  const expPoints = calculateExpPoints(tasksWithDifficulty)
 
-
+  console.log('tasks:', tasks)
+  console.log('tasks.length:', tasks?.length)
   return (
     <div className='m-12 ml-32 flex flex-col gap-8'>
       <div className='bg-white outline-[#ADD3EA] outline-4 p-4 rounded-2xl w-fit'>
         <h2 className='font-delius text-2xl'>EXP Points: {expPoints}</h2>
       </div>
       
-      <div className='flex flex-col gap-8'>
-
-        <div className='flex flex-row gap-8'>
-          <button className="font-delius p-4  bg-[#ADD3EA] rounded-xl font-bold">Daily</button>
-          <button className="font-delius p-4  bg-[#ADD3EA] rounded-xl font-bold">Weekend</button>
-        </div>
+      <div className='flex flex-col gap-8'>`
+        <FilterButtons currentFilter={filter} />
 
         <div className='flex flex-col items-center justify-center bg-[#CCC38D] rounded-2xl w-full'>
-          <p className='font-cherry text-5xl text-center p-12'>Tasks for Today</p>
-          <div className='flex flex-col bg-[#FBF5D1] font-delius p-8 rounded-b-2xl'>
-            <h2>Pending Tasks</h2>
-            <TaskListClient tasks={pendingTasks} mode="pending" />
-            <br />
-            <h2>Completed Tasks</h2>
-            <TaskListClient tasks={completedTasks} mode="completed" />
-          </div>
+          <p className='font-cherry text-5xl text-center p-12'>
+            {filter === 'daily' ? "Today's Tasks" : filter === 'week' ? "This Week's Tasks" : "All Tasks"}
+          </p>
+          {tasks && tasks.length > 0 ? (
+            <div className='flex flex-col bg-[#FBF5D1] font-delius p-8 rounded-b-2xl'>
+              <h2>Pending Tasks</h2>
+              <TaskListClient tasks={pendingTasks} mode="pending" />
+              <br />
+              <h2>Completed Tasks</h2>
+              <TaskListClient tasks={completedTasks} mode="completed" />
+            </div>
+          ) : (
+            <div className='flex flex-col bg-[#FBF5D1] font-delius p-10 rounded-b-2xl w-full'>
+              <p>No pending tasks</p>
+            </div>
+          )}
         </div>
-
       </div>
     </div>
   )
