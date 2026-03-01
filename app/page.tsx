@@ -1,5 +1,6 @@
 import { createClient } from '@/utils/supabase/server'
 import { cookies } from 'next/headers'
+import './globals.css'
 
 export default async function Page() {
   const cookieStore = await cookies()
@@ -10,7 +11,7 @@ export default async function Page() {
   return (
     <ul>
       {todos?.map((todo) => (
-        <li>{todo.task}</li>
+        <li key={todo.id}>{todo.task}</li>
       ))}
     </ul>
   )
