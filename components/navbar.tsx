@@ -7,7 +7,7 @@ import { useState } from 'react';
 export default function Navbar() {
   return (
     <>
-      <div className="w-[15%] top-0 sticky h-screen">
+      <div className="w-full top-0 sticky h-screen">
         <FullNav />
       </div>
     </>
