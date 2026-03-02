@@ -1,5 +1,8 @@
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
+import { FaSave } from "react-icons/fa";
+import { IoAdd } from "react-icons/io5";
+import MoodSelector from "./mood_selector";
 
 export default function NewJournalPage() {
   async function createJournal(formData: FormData) {
@@ -9,10 +12,11 @@ export default function NewJournalPage() {
 
     const entry_title = formData.get("entry_title") as string;
     const entry_text = formData.get("entry_text") as string;
+    const mood_id = Number(formData.get("mood"));
 
     const { error } = await supabase
       .from("journal_entry")
-      .insert({ entry_title, entry_text });
+      .insert({ entry_title, entry_text, mood_id, });
 
     if (error) {
       console.error("SUPABASE ERROR:", error);
@@ -24,53 +28,32 @@ export default function NewJournalPage() {
 
   return (
      <>
-      <main className="min-h-screen bg-[#F0B6CF]">
+      <div className=" flex flex-col gap-24 items-center mb-12">
+      
 
       {/* Header */}
-      <header className="w-screen bg-[#FBF5D1] px-8 py-10">
+      <header className="w-full bg-[#FBF5D1] px-8 py-10">
         <h1
-          className="text-center text-[#163F55] text-4xl font-normal"
-          style={{ fontFamily: '"Cherry Bomb One", system-ui' }}
+          className="text-center text-[#163F55] text-6xl font-cherry"
         >
           How are you feeling today?
         </h1>
 
-        {/* Mood buttons */}
-        <div className="flex flex-wrap justify-center mt-6 gap-2">
-          <button className="bg-transparent text-[#FA5659] border-none p-6 rounded-xl text-xl cursor-pointer hover:bg-[#ffb3ba] transition-colors">
-            <span className="material-symbols-outlined">sentiment_stressed</span>
-          </button>
-          <button className="bg-transparent text-[#F7A34A] border-none p-6 rounded-xl text-xl cursor-pointer hover:bg-[#ffdfba] transition-colors">
-            <span className="material-symbols-outlined">sentiment_worried</span>
-          </button>
-          <button className="bg-transparent text-[#F8D042] border-none p-6 rounded-xl text-xl cursor-pointer hover:bg-[#ffffba] transition-colors">
-            <span className="material-symbols-outlined">sentiment_neutral</span>
-          </button>
-          <button className="bg-transparent text-[#62B64D] border-none p-6 rounded-xl text-xl cursor-pointer hover:bg-[#baffc9] transition-colors">
-            <span className="material-symbols-outlined">sentiment_calm</span>
-          </button>
-          <button className="bg-transparent text-[#484572] border-none p-6 rounded-xl text-xl cursor-pointer hover:bg-[#bae1ff] transition-colors">
-            <span className="material-symbols-outlined">sentiment_satisfied</span>
-          </button>
-        </div>
+        <MoodSelector />
       </header>
 
-      {/* Journal form */}
-      <form action="/submit-article" method="POST" className="relative">
+      <form action={createJournal} className="flex flex-col gap-4 w-[70%] bg-white rounded-2xl p-4 resize-y">
+        <input
+          name="entry_title"
+          placeholder="Title"
+          className="font-cherry text-5xl text-center"
+          required
+        />
         <textarea
-          id="article-content"
-          name="content"
-          placeholder="Start writing..."
-          className="
-            block w-[80%] mx-[10%] mt-[5%]
-            min-h-110 p-3
-            border-2 border-[#ccc] rounded
-            bg-[#f8f8f8]
-            text-base
-            resize-none
-            focus:outline-none focus:border-[#163F55]
-          "
-          style={{ fontFamily: '"Delius Unicase", cursive' }}
+          name="entry_text"
+          placeholder="Write your thoughts..."
+          className="font-delius min-h-200 resize-y p-4"
+          required
         />
 
         {/* Save button */}
@@ -84,7 +67,7 @@ export default function NewJournalPage() {
             hover:bg-[#F0B6CF] transition-colors
           "
         >
-          <span className="material-icons">save</span>
+          <FaSave/>
         </button>
 
         {/* Upload / add button */}
@@ -98,10 +81,10 @@ export default function NewJournalPage() {
             hover:bg-[#F0B6CF] transition-colors
           "
         >
-          <span className="material-icons">add</span>
+          <IoAdd />
         </button>
       </form>
-    </main>
+    </div>
     </>
   )
 }

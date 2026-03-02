@@ -39,7 +39,7 @@ function calculateExpPoints(tasks: TaskWithDifficulty[]) {
 
 export default async function Page() {
   const cookieStore = await cookies()
-  const supabase = createClient(cookieStore)
+  const supabase = await createClient(); 
 
     const { data: tasks } = await supabase.from('task').select('*')
     const { data: difficulties } = await supabase.from('difficulty').select('*')

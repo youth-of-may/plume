@@ -26,17 +26,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-       <head>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cherry+Bomb+One&family=Delius+Unicase:wght@400;700&display=swap" />
-        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
-      </head>
-      <body
-        className={`${cherry.variable} ${delius.variable} flex flex-row antialiased`}
-      >
+      <main className="w-full">
         {children}
-      </body>
-    </html>
+      </main>
   );
 }
