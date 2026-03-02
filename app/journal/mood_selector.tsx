@@ -19,7 +19,7 @@ export default function MoodSelector(){
     return(
         <div className="flex flex-wrap justify-center mt-6 gap-2">
 
-            <input type="hidden" name="mood" value={selectedMood ?? ""} />
+            <input type="hidden" name="mood_id" value={selectedMood ?? ""} />
 
             {moods.map((mood) => (
               <button

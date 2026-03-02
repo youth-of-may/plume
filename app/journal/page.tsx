@@ -12,8 +12,8 @@ export default function NewJournalPage() {
 
     const entry_title = formData.get("entry_title") as string;
     const entry_text = formData.get("entry_text") as string;
-    const mood_id = Number(formData.get("mood"));
 
+    const mood_id = Number(formData.get("mood_id"));
     const { error } = await supabase
       .from("journal_entry")
       .insert({ entry_title, entry_text, mood_id, });
@@ -31,18 +31,20 @@ export default function NewJournalPage() {
       <div className=" flex flex-col gap-24 items-center mb-12">
       
 
-      {/* Header */}
-      <header className="w-full bg-[#FBF5D1] px-8 py-10">
-        <h1
-          className="text-center text-[#163F55] text-6xl font-cherry"
-        >
-          How are you feeling today?
-        </h1>
-
-        <MoodSelector />
-      </header>
-
       <form action={createJournal} className="flex flex-col gap-4 w-[70%] bg-white rounded-2xl p-4 resize-y">
+
+        
+        {/* Header */}
+        <header className="w-full bg-[#FBF5D1] px-8 py-10">
+          <h1
+            className="text-center text-[#163F55] text-6xl font-cherry"
+          >
+            How are you feeling today?
+          </h1>
+
+          <MoodSelector />
+        </header>
+
         <input
           name="entry_title"
           placeholder="Title"
