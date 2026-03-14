@@ -13,33 +13,91 @@ export default function Signup() {
     const router = useRouter();
 
     async function signUpNewUser() {
+        const selectedUsername = username.trim();
+        const selectedName = name.trim();
+        const selectedEmail = email.trim();
+        const selectedPassword = password.trim();
+        const selectedEmailLower = selectedEmail.toLowerCase();
+
+        if (!selectedUsername) {
+            alert('Username is required.');
+            return;
+        }
+
+        if (!selectedName) {
+            alert('Name is required.');
+            return;
+        }
+
+        if (!selectedEmail) {
+            alert('Email is required.');
+            return;
+        }
+
+        if (!selectedPassword) {
+            alert('Password is required.');
+            return;
+        }
+
+        const usernameCheckResponse = await fetch(
+            `/api/profile/check?username=${encodeURIComponent(selectedUsername)}&email=${encodeURIComponent(selectedEmailLower)}`
+        );
+        const usernamePayload = await usernameCheckResponse.json().catch(() => null);
+
+        if (!usernameCheckResponse.ok || !usernamePayload?.ok) {
+            const reason = usernamePayload?.error || "Unable to verify username or email right now.";
+            console.warn('Could not verify username/email availability:', reason);
+            alert(`Signup check failed. ${reason}`);
+            return;
+        }
+
+        if (usernamePayload.emailTaken) {
+            alert('An account with this email already exists. Please use another email.');
+            return;
+        }
+
+        if (usernamePayload.usernameTaken) {
+            alert('Username is already taken. Please choose another one.');
+            return;
+        }
+
         const { data, error } = await supabase.auth.signUp({
-            email: email,
-            password: password,
+            email: selectedEmail,
+            password: selectedPassword,
             options: {
                 emailRedirectTo: `${window.location.origin}/confirm`,
+                data: {
+                    name: selectedName,
+                    username: selectedUsername,
+                },
             },
         });
 
         if (error) {
             console.error('Sign up error:', error.message);
+            if (
+                error.message.toLowerCase().includes("username") ||
+                error.message.toLowerCase().includes("email") ||
+                error.message.toLowerCase().includes("duplicate") ||
+                error.message.toLowerCase().includes("already registered") ||
+                error.code === '23505'
+            ) {
+                if (error.message.toLowerCase().includes("email")) {
+                    alert('An account with this email already exists. Please use another email.');
+                } else {
+                    alert('Username is already taken. Please choose another one.');
+                }
+            } else {
+                alert(error.message);
+            }
             return;
         }
 
         if (data.user) {
-            // only create a profile if user successfully signed up
-            const { error: profileError } = await supabase.from('profile').insert({
-                user_id: data.user.id,
-                username: username,
-                name: name,
-            });
-
-            if (profileError) {
-                console.error('Profile creation error:', profileError.message);
-                return;
-            }
-            router.push('/confirm');
-            console.log('User signed up and profile created:', data.user.id);
+            console.log("Signed up user id:", data.user.id);
+            console.log("Signed up user metadata:", data.user.user_metadata);
+            router.push('/signup/email-sent');
+            console.log('Signup initiated for user:', data.user.id);
         }
     }
 
