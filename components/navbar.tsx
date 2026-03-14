@@ -69,7 +69,7 @@ function FullNav() {
           <NavLink href="/" label="shop" active={pathname === "/"} />
           <NavLink href="/" label="gacha" active={pathname === "/"} />
           <NavLink href="/" label="dashboard" active={pathname === "/"} />
-          <NavLink href="/" label="inventory" active={pathname === "/"} />
+          <NavLink href="/inventory" label="inventory" active={pathname === "/"} />
           <NavLink href="/" label="item list" active={pathname === "/"} />
       </nav>
       <div className="flex flex-col items-center">
