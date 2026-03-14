@@ -7,6 +7,7 @@ const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 export async function GET(req: NextRequest) {
   const username = new URL(req.url).searchParams.get("username")?.trim();
   const email = new URL(req.url).searchParams.get("email")?.trim().toLowerCase();
+  const usernamePattern = /^[A-Za-z0-9_]+$/;
 
   if (!username && !email) {
     return NextResponse.json(
@@ -82,6 +83,13 @@ export async function GET(req: NextRequest) {
       usernameTaken: false,
       emailTaken,
     });
+  }
+
+  if (!usernamePattern.test(username)) {
+    return NextResponse.json(
+      { ok: false, error: "Username can only contain letters, numbers, and underscores." },
+      { status: 400 }
+    );
   }
 
   if (username && email && typeof (supabase.auth as any).admin?.getUserByEmail === "function") {
