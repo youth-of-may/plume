@@ -35,7 +35,8 @@ export default function Login() {
                 console.error("Profile check error:", profileResult.error)
             }
         }
-        router.push('/');
+        router.refresh();
+        router.replace('/');
         console.log('User signed in:', data.user);
     }
 

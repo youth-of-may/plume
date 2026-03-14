@@ -2,42 +2,52 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from "@/utils/supabase/client";
+import { useEffect, useState } from "react";
 
 export default function Navbar() {
-  return (
-    <>
-      <div className="w-full top-0 sticky h-screen">
-        <FullNav />
-      </div>
-    </>
-  );
+  return <FullNav />;
 }
-
-import { usePathname } from "next/navigation";
 
 /// FullNav
 function FullNav() {
   const router = useRouter();
-  const pathname = usePathname();
-  const [isUser, setIsUser] = useState(false);
   const supabase = createClient();
-
-  async function checkUser() {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      console.log('No user logged in.');
-      return;
-    }
-    const boolUser = user ? true : false;
-    setIsUser(boolUser)
-  }
+  const [isUser, setIsUser] = useState<boolean>(false);
+  const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
+    let mounted = true;
+
+    const checkUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!mounted) return;
+      setIsUser(!!session?.user);
+      setIsReady(true);
+    };
+
     checkUser();
-  })
+
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!mounted) return;
+      setIsUser(!!session?.user);
+      setIsReady(true);
+    });
+
+    return () => {
+      mounted = false;
+      authListener.subscription.unsubscribe();
+    };
+  }, []);
+
+  if (!isReady) {
+    return null;
+  }
+
+  if (!isUser) {
+    return null;
+  }
 
   async function signOut() {
     const { error } = await supabase.auth.signOut();
@@ -47,41 +57,43 @@ function FullNav() {
       return;
     }
     setIsUser(false);
-    router.push('/');
+    router.replace('/login');
+    router.refresh();
     console.log('Successfully signed out')
   }
 
 
 
   return (
-    <div className="flex flex-col h-screen bg-[#F7F9FC] shadow-sm border-r-12 border-r-[#ADD3EA] pt-8 pb-8 gap-12">
+    <div className="w-[15%] shrink-0 top-0 sticky h-screen">
+      <div className="flex flex-col h-screen bg-[#F7F9FC] shadow-sm border-r-12 border-r-[#ADD3EA] pt-8 pb-8 gap-12">
       <div className="flex flex-col items-center font-delius gap-4">
           <Image src='/chiikawa.jpg' width={120} height={120} alt='Profile Picture' className="rounded-full border-4 border-[#4F84A5]"/>
-          <p className="text-lg font-bold">username</p>
-           {isUser && <Link href="/profile/edit"><p className="text-sm">edit profile</p></Link>}
+          {isUser && <p className="text-lg font-bold">username</p>}
+          {isUser && <Link href="/profile/edit"><p className="text-sm">edit profile</p></Link>}
       </div>
       <nav className="flex flex-col items-center w-full gap-4 font-delius">
-          <NavLink href="/" label="home" active={pathname === "/"} />
-          <NavLink href="/journal" label="write entry" active={pathname === "/"} />
-          <NavLink href="/journal" label="journal archive" active={pathname === "/"} />
-          <NavLink href="/" label="calendar" active={pathname === "/"} />
-          <NavLink href="/tasks" label="task list" active={pathname === "/"} />
-          <NavLink href="/" label="shop" active={pathname === "/"} />
-          <NavLink href="/" label="gacha" active={pathname === "/"} />
-          <NavLink href="/" label="dashboard" active={pathname === "/"} />
-          <NavLink href="/" label="inventory" active={pathname === "/"} />
-          <NavLink href="/" label="item list" active={pathname === "/"} />
+          <NavLink href="/" label="home" />
+          <NavLink href="/journal" label="write entry" />
+          <NavLink href="/journal" label="journal archive" />
+          <NavLink href="/" label="calendar" />
+          <NavLink href="/tasks" label="task list" />
+          <NavLink href="/" label="shop" />
+          <NavLink href="/" label="gacha" />
+          <NavLink href="/" label="dashboard" />
+          <NavLink href="/" label="inventory" />
+          <NavLink href="/" label="item list" />
       </nav>
       <div className="flex flex-col items-center">
-        {isUser ? <button className="font-delius p-4  bg-[#ADD3EA] rounded-3xl font-bold" onClick={signOut}>Log Out</button> : 
-        <Link className="font-delius p-4  bg-[#ADD3EA] rounded-3xl font-bold" href="/login">Login</Link>}
+        <button className="font-delius p-4  bg-[#ADD3EA] rounded-3xl font-bold" onClick={signOut}>Log Out</button>
+      </div>
       </div>
     </div>
   );
 }
 
 // Helper component to remove repetitive code and remove fixed widths
-function NavLink({ href, label, active }: { href: string, label: string, active: boolean }) {
+function NavLink({ href, label }: { href: string, label: string }) {
   return (
     <Link
       href={href}
