@@ -44,8 +44,8 @@ export default function Confirm() {
         return;
       }
 
-      setStatus("Profile ready. Redirecting to the app...");
-      setTimeout(() => router.push("/"), 1000);
+      setStatus("Profile ready. Redirecting to pet selection...");
+      setTimeout(() => router.push("/pet-selection"), 1000);
     }
 
     ensureProfileForConfirmedUser();
