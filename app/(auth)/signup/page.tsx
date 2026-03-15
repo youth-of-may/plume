@@ -109,7 +109,7 @@ export default function Signup() {
     }
 
     return (
-        <div className={"bg-[#FBF5D1] px-20 pt-8 pb-15 border-5 border-[#E4DCAB] rounded-3xl justify-items-center translate-x-65 translate-y-15 shadow-xl/40"}>
+        <div className={"bg-[#FBF5D1] px-20 pt-8 pb-15 border-5 border-[#E4DCAB] rounded-3xl justify-items-center shadow-xl/40"}>
             <h2 className="font-cherry text-[#2E2805] text-5xl">CREATE ACCOUNT</h2>
             <form onSubmit={(e) => {
                 e.preventDefault();
@@ -166,3 +166,4 @@ export default function Signup() {
         </div>
     );
 }
+
