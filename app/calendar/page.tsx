@@ -192,15 +192,13 @@ export default function KawaiiCalendar() {
         : [];
 
     return (
-        <div className="min-h-screen w-full flex items-center justify-center bg-pink-200 p-6">
-            <div className="rounded-3xl w-full max-w-5xl shadow-lg shadow-black/20 overflow-hidden font-delius">
+        <div className="min-h-screen items-center justify-center bg-[#F0B6CF] py-6 px-12">
+            {/* Title */}
+                <h1 className="font-cherry text-6xl text-center tracking-widest text-[#2E2805] drop-shadow-lg drop-shadow-black/20 p-8">
+                    CALENDAR
+                </h1>
+            <div className="rounded-3xl w-full max-w-5xl shadow-xl shadow-black/20 overflow-hidden font-delius bg-[#CCC38D]">
                 <div className="bg-[#CCC38D]">
-
-                    {/* Title */}
-                    <h1 className="font-cherry bg-[#bbad65db]/20 text-6xl text-center tracking-widest text-[#2E4633] drop-shadow-sm drop-shadow-black/20 p-8">
-                        CALENDAR
-                    </h1>
-
                     {/* Header */}
                     <div className="flex flex-row items-center px-6 py-6">
                         <div className="flex-1" />
@@ -227,13 +225,13 @@ export default function KawaiiCalendar() {
                         <div className="flex-1 flex justify-end">
                             <button
                                 onClick={() => setCurrent(addMonths(current, 1))}
-                                className="bg-transparent border-2 border-white rounded-full w-12 h-12 flex items-center justify-center font-bold text-xl text-white hover:bg-[#92cbee] transition-colors"
+                                className="bg-transparent border-2 border-white rounded-full w-12 h-12 me-6 flex items-center justify-center font-bold text-xl text-white hover:bg-[#92cbee] transition-colors"
                             >→</button>
                         </div>
                     </div>
 
                     {/* Day labels — reverted to original */}
-                    <div className="grid grid-cols-7 bg-[#ADD3EA] text-center text-lg font-bold text-blue-700 py-5 px-6">
+                    <div className="grid grid-cols-7 bg-[#ADD3EA] text-center text-lg font-bold text-[#2E2805] py-6 px-6 rounded-t-xl shadow-md border-y-2 border-[#719db8]">
                         {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(d => (
                             <div key={d}>{d}</div>
                         ))}
@@ -241,7 +239,7 @@ export default function KawaiiCalendar() {
 
                     {/* Grid + cat wrapper */}
                     <div className="relative bg-[#FBF5D1]">
-                        <div className="grid grid-cols-7 place-items-center px-6 gap-y-5 pt-4 pb-24">
+                        <div className="grid grid-cols-7 place-content-center px-6 gap-y-2 pt-4 pb-24">
                             {days.map(day => {
                                 const isToday = isSameDay(day, new Date());
                                 const inMonth = isSameMonth(day, current);
@@ -251,14 +249,14 @@ export default function KawaiiCalendar() {
                                         key={day.toISOString()}
                                         onClick={() => openListModal(day)}
                                         className={`flex flex-col items-center justify-start
-                                            w-full min-h-[60px] p-1 cursor-pointer transition-colors
+                                            w-full h-[100px] p-1 cursor-pointer transition-colors
                                             ${inMonth ? "opacity-100" : "opacity-40"}`}
                                     >
                                         <div className={`text-2xl font-black flex justify-center items-center
                                             w-12 h-12 rounded-2xl transition-colors tracking-tight
                                             ${isToday
-                                                ? "bg-blue-200 text-[#163F55] shadow-md shadow-blue-950/10"
-                                                : "text-[#163F55] hover:bg-yellow-200"
+                                                ? "bg-blue-200 text-[#2E2805] shadow-md shadow-blue-950/10"
+                                                : "text-[#2E2805] hover:bg-[#bfba9ba4]"
                                             }`}
                                         >
                                             {format(day, "d")}
@@ -266,14 +264,14 @@ export default function KawaiiCalendar() {
                                         {dayEvents.slice(0, 2).map(ev => (
                                             <div
                                                 key={ev.id}
-                                                className={`mt-0.5 text-[11px] font-semibold tracking-wide rounded px-1 truncate w-full text-center
+                                                className={`mt-0.5 text-[11px] font-semibold tracking-wide rounded px-1 truncate w-full text-center shadow-sm
                                                     ${CATEGORY_COLORS[ev.category] ?? "bg-pink-300 text-pink-900"}`}
                                             >
                                                 {ev.name}
                                             </div>
                                         ))}
                                         {dayEvents.length > 2 && (
-                                            <div className="text-[10px] font-medium text-[#a0aec0] mt-0.5">
+                                            <div className="text-[10px] font-medium text-[#2e2805a8] mt-0.5">
                                                 +{dayEvents.length - 2} more
                                             </div>
                                         )}
@@ -295,43 +293,43 @@ export default function KawaiiCalendar() {
                 {/* Modal */}
                 {modal.open && (
                     <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50">
-                        <div className="bg-[#FFEDF5] outline-4 outline-[#F0B6CF] rounded-3xl p-8 w-md shadow-2xl">
+                        <div className="bg-white outline-4 outline-[#F0B6CF] rounded-3xl p-8 w-md shadow-2xl">
 
                             {/* LIST VIEW */}
                             {modalMode === "list" && (
                                 <div className="space-y-4">
                                     <div className="flex items-center justify-between">
-                                        <h2 className="font-black tracking-tight text-[#163F55] text-lg">
+                                        <h2 className="font-black tracking-tight text-[#2E2805] text-lg">
                                             {modal.date ? format(modal.date, "EEEE, MMMM d") : ""}
                                         </h2>
                                         <button onClick={closeModal} className="text-gray-400 hover:text-gray-600 text-xl">✕</button>
                                     </div>
 
                                     {selectedDayEvents.length === 0 ? (
-                                        <p className="text-sm font-medium text-[#a0aec0] text-center py-4">No events yet.</p>
+                                        <p className="text-sm font-medium text-[#2e2805a8] text-center py-4">No events yet.</p>
                                     ) : (
                                         <ul className="space-y-2 max-h-64 overflow-y-auto">
                                             {selectedDayEvents.map(ev => (
                                                 <li key={ev.id}
-                                                    className="bg-white rounded-2xl px-4 py-3 flex items-start justify-between gap-2 shadow-sm">
+                                                    className="bg-white px-4 py-3 flex items-start justify-between gap-2">
                                                     <div className="flex-1 min-w-0">
                                                         <div className="flex items-center gap-2">
-                                                            <span className={`text-[10px] font-bold tracking-wide uppercase px-2 py-0.5 rounded-full ${CATEGORY_COLORS[ev.category]}`}>
+                                                            <span className={`text-[10px] font-bold tracking-wide uppercase px-2 py-0.5 shadow-sm rounded-full ${CATEGORY_COLORS[ev.category]}`}>
                                                                 {ev.category}
                                                             </span>
-                                                            <span className="text-xs font-medium text-[#a0aec0]">{ev.time}</span>
+                                                            <span className="text-xs font-medium text-[#2e280570]">{ev.time}</span>
                                                         </div>
-                                                        <p className="font-black tracking-tight text-[#163F55] text-sm mt-1 truncate">{ev.name}</p>
-                                                        {ev.notes && <p className="text-xs font-medium text-[#a0aec0] truncate">{ev.notes}</p>}
+                                                        <p className="font-black tracking-tight text-[#2e2805] text-sm mt-1 truncate">{ev.name}</p>
+                                                        {ev.notes && <p className="text-xs font-medium text-[#2e280570] truncate">{ev.notes}</p>}
                                                     </div>
                                                     <div className="flex gap-1 shrink-0">
                                                         <button
                                                             onClick={() => openEditForm(ev)}
-                                                            className="text-xs font-bold bg-[#ADD3EA] hover:bg-[#92cbee] text-[#163F55] px-2 py-1 rounded-full transition-colors"
+                                                            className="text-xs font-bold bg-[#ADD3EA] hover:bg-[#92cbee] text-[#163F55] border-2 border-[#8FBCD6] px-2 py-1 rounded-full transition-colors shadow-sm"
                                                         >edit</button>
                                                         <button
                                                             onClick={() => deleteEvent(ev.id)}
-                                                            className="text-xs font-bold bg-pink-200 hover:bg-pink-300 text-pink-800 px-2 py-1 rounded-full transition-colors"
+                                                            className="text-xs font-bold bg-[#F0B6CF] hover:bg-pink-300 border-2 border-[#d790af] text-pink-800 px-3 py-1 rounded-full transition-colors shadow-sm"
                                                         >del</button>
                                                     </div>
                                                 </li>
@@ -341,9 +339,9 @@ export default function KawaiiCalendar() {
 
                                     <button
                                         onClick={openNewEventForm}
-                                        className="w-full font-bold tracking-wide bg-[#ADD3EA] hover:bg-[#92cbee] text-[#163F55] py-2 rounded-full text-sm transition-colors"
+                                        className="w-full font-bold tracking-wide bg-[#ADD3EA] hover:bg-[#92cbee] text-[#163F55] py-2 rounded-full border-2 border-[#8FBCD6] text-sm transition-colors shadow-md"
                                     >
-                                        + add event
+                                        add event +
                                     </button>
                                 </div>
                             )}
@@ -354,68 +352,68 @@ export default function KawaiiCalendar() {
                                     <div className="flex items-center gap-2 mb-1">
                                         <button
                                             onClick={() => setModalMode("list")}
-                                            className="text-[#a0aec0] hover:text-gray-600 text-sm font-semibold"
+                                            className="text-[#2e2805a8] hover:text-[#2e2805f1] text-sm font-semibold"
                                         >← back</button>
-                                        <h2 className="font-black tracking-tight text-[#163F55] text-sm">
+                                        <h2 className="font-black tracking-tight text-[#2E2805] text-sm">
                                             {editingId ? "Edit Event" : "New Event"}
                                         </h2>
                                     </div>
                                     <div>
-                                        <label className="text-xs font-extrabold tracking-widest uppercase text-[#a0aec0]">Event Name*</label>
+                                        <label className="text-xs font-extrabold tracking-widest uppercase text-[#2e2805a8]">Event Name*</label>
                                         <input
                                             value={form.name}
                                             onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
                                             placeholder="Input name"
-                                            className="w-full border-b border-[#F0B6CF] bg-transparent text-sm font-semibold text-[#163F55] placeholder:text-[#c9b8c0] placeholder:font-normal py-1 focus:outline-none"
+                                            className="w-full border-b border-[#F0B6CF] text-sm font-semibold text-[#2E2805] placeholder:text-[#c9b8c0] placeholder:font-normal py-1 ps-0.75 focus:outline-none"
                                         />
                                     </div>
                                     <div>
-                                        <label className="text-xs font-extrabold tracking-widest uppercase text-[#a0aec0]">Date*</label>
-                                        <div className="text-sm font-semibold text-[#163F55] border-b border-[#F0B6CF] py-1">
+                                        <label className="text-xs font-extrabold tracking-widest uppercase text-[#2e2805a8]">Date*</label>
+                                        <div className="text-sm font-semibold text-[#2E2805] border-b border-[#F0B6CF] py-1 ps-0.75">
                                             {modal.date ? format(modal.date, "EEEE, MMMM d") : ""}
                                         </div>
                                     </div>
                                     <div>
-                                        <label className="text-xs font-extrabold tracking-widest uppercase text-[#a0aec0]">Time</label>
+                                        <label className="text-xs font-extrabold tracking-widest uppercase text-[#2e2805a8]">Time</label>
                                         <br />
                                         <input
                                             type="time"
                                             value={form.time}
                                             onChange={e => setForm(f => ({ ...f, time: e.target.value }))}
-                                            className="text-sm font-semibold text-[#163F55] border-b border-[#F0B6CF] bg-transparent focus:outline-none"
+                                            className="text-sm font-semibold text-[#2E2805] p-1.5 rounded-t-lg border-b border-[#F0B6CF] bg-[#f0b6cf31] focus:outline-none shadow-sm"
                                         />
                                     </div>
                                     <div>
-                                        <label className="text-xs font-extrabold tracking-widest uppercase text-[#a0aec0]">Category</label>
+                                        <label className="text-xs font-extrabold tracking-widest uppercase text-[#2e2805a8]">Category</label>
                                         <br />
                                         <select
                                             value={form.category}
                                             onChange={e => setForm(f => ({ ...f, category: e.target.value }))}
-                                            className="mt-1 text-sm font-semibold text-[#163F55] bg-white border-b border-[#F0B6CF] rounded-lg px-2 py-0.5 focus:outline-none"
+                                            className="mt-1 text-sm font-semibold text-[#2E2805] bg-[#f0b6cf31] border-b border-[#F0B6CF] rounded-t-lg px-2 py-1.5 focus:outline-none shadow-sm"
                                         >
                                             {CATEGORIES.map(c => <option key={c}>{c}</option>)}
                                         </select>
                                     </div>
                                     <div>
-                                        <label className="text-xs font-extrabold tracking-widest uppercase text-[#a0aec0]">Notes</label>
+                                        <label className="text-xs font-extrabold tracking-widest uppercase text-[#2e2805a8]">Notes</label>
                                         <textarea
                                             value={form.notes}
                                             onChange={e => setForm(f => ({ ...f, notes: e.target.value }))}
                                             placeholder="Input notes"
-                                            className="w-full border-b border-[#F0B6CF] bg-transparent text-sm font-semibold text-[#163F55] placeholder:text-[#c9b8c0] placeholder:font-normal px-2 py-2 focus:outline-none resize-none"
+                                            className="w-full border-b border-[#F0B6CF] bg-[#f0b6cf31] rounded-t-lg text-sm font-semibold text-[#2E2805] placeholder:text-[#c9b8c0] placeholder:font-normal px-3 py-3 shadow-sm focus:outline-none resize-none"
                                             rows={4}
                                         />
                                     </div>
                                     <div className="flex gap-3 pt-2">
                                         <button
                                             onClick={saveEvent}
-                                            className="flex-1 font-bold tracking-wide bg-[#ADD3EA] hover:bg-[#92cbee] text-[#163F55] py-1.5 rounded-full text-sm transition-colors"
+                                            className="flex-1 font-bold tracking-wide bg-[#ADD3EA] hover:bg-[#92cbee] border-2 border-[#8FBCD6] text-[#163F55] py-1.5 rounded-full text-sm transition-colors shadow-md"
                                         >
                                             {editingId ? "update" : "save"}
                                         </button>
                                         <button
                                             onClick={() => setModalMode("list")}
-                                            className="flex-1 font-bold tracking-wide bg-pink-200 hover:bg-pink-300 text-pink-800 py-1.5 rounded-full text-sm transition-colors"
+                                            className="flex-1 font-bold tracking-wide border-2 border-[#dc9eb9] bg-[#F0B6CF] hover:bg-pink-300 text-pink-800 py-1.5 rounded-full text-sm transition-colors shadow-md"
                                         >
                                             cancel
                                         </button>
