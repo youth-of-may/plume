@@ -20,6 +20,7 @@ export async function getPetImages(){
     const { data: pets, error: notFound } = await supabase
         .from("pet")
         .select("*")
+        .order("pet_id", {ascending: true})
 
     if (notFound) {
         console.error(notFound.message);
@@ -37,6 +38,7 @@ export default async function petselection(){
     return (
     <div className={"bg-[#FBF5D1] border-5 border-[#E4DCAB] grid grid-template-rows-2 h-150 w-250 pt-10 px-10 pb-20 rounded-4xl justify-items-center translate-x-10 translate-y-15 shadow-xl/40 overflow-hidden"}>
             <h1 className="font-cherry text-[#2E2805] text-6xl pb-10">CHOOSE YOUR PET</h1>
+            <p className="font-delius text-3xl text-[#2E2805] pb-6">Before you proceed.</p>
             <div className="flex gap-15 justify-center bg-[#fef5ffbb] py-6 rounded-4xl shadow-lg">
                 {pets?.map((pet) => (
                     <div key={pet.pet_id} className="grid grid-template-rows-2 place-items-center gap-8">
