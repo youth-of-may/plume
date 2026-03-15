@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 
 export async function fetchUser() {
     const cookieStore = await cookies();
-    const supabase = createClient(cookieStore);
+    const supabase = await createClient(cookieStore);
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
         console.log('No user logged in.');
@@ -16,12 +16,17 @@ export async function fetchUser() {
         .from('profile')
         .select()
         .eq('user_id', user.id)
-        .single()
-        ;
-    console.log(data)
+        .maybeSingle();
+
     if (error) {
         console.error('Fetch error:', error.message);
         return;
     }
+
+    if (!data) {
+        console.warn("Fetch returned no profile row for user", user.id);
+        return;
+    }
+
     return { user, profile: data };
 }
