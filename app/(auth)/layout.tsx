@@ -25,8 +25,10 @@ export default function SignupLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className={`${cherry.variable} ${delius.variable} flex flex-row antialiased`}>
-      <div>{children}</div>
+    <div
+      className={`${cherry.variable} ${delius.variable} min-h-screen w-full flex items-center justify-center antialiased`}
+    >
+      <div className="w-full px-4 py-8 flex items-center justify-center">{children}</div>
     </div>
   );
 }

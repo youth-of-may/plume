@@ -41,7 +41,7 @@ export default function Login() {
     }
 
     return (
-        <div className={"bg-[#FBF5D1] px-15 pt-20 pb-15 border-5 border-[#E4DCAB] rounded-4xl justify-items-center translate-x-75 translate-y-15 shadow-xl/40"}>
+        <div className="bg-[#FBF5D1] px-15 pt-20 pb-15 border-5 border-[#E4DCAB] rounded-4xl justify-items-center shadow-xl/40">
             <h2 className="font-cherry text-[#2E2805] text-7xl pb-10">Login</h2>
 
             <form onSubmit={(e) => {
