@@ -17,12 +17,12 @@ export default function Forgot_Password() {
             console.error('Password Update error:', error.message);
             return;
         }
-        router.push('/login');
+        router.push('/forgot-password/email-sent');
     }
 
 
     return (
-        <div className={"bg-[#FBF5D1] px-10 pt-20 pb-15 border-5 border-[#E4DCAB] rounded-4xl justify-items-center translate-x-65 translate-y-15 shadow-xl/40"}>
+        <div className={"bg-[#FBF5D1] px-10 pt-20 pb-15 border-5 border-[#E4DCAB] rounded-4xl justify-items-center shadow-xl/40"}>
             <h2 className="font-cherry text-[#2E2805] text-5xl pb-10">FORGOT PASSWORD</h2>
             <form onSubmit={(e) => {
                 e.preventDefault();
@@ -47,4 +47,5 @@ export default function Forgot_Password() {
         </div>
     );
 }
+
 
