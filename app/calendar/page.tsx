@@ -20,7 +20,7 @@ type Event = {
 
 type Task = {
     id: string;
-    name: string;
+    task_details: string;
     is_complete: boolean;
     created_at: string;
     task_title: string;
@@ -43,6 +43,40 @@ const TASK_DIFFICULTY_COLORS: Record<string, string> = {
     Easy: "bg-emerald-200 text-emerald-800",
     Medium: "bg-orange-200 text-orange-800",
     Hard: "bg-red-200 text-red-800",
+};
+
+// Parses a "yyyy-MM-dd" string as local midnight to avoid UTC off-by-one issues
+function parseLocalDate(dateStr: string): Date {
+    const d = new Date(dateStr); // correctly parses "+00" as UTC
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+}
+
+function getDeadlineUrgency(deadline: string): "overdue" | "today" | "soon" | null {
+    const today = new Date();
+    const due = parseLocalDate(deadline);
+    const diffDays = Math.ceil((due.getTime() - new Date(today.setHours(0, 0, 0, 0)).getTime()) / (1000 * 60 * 60 * 24));
+    if (diffDays < 0) return "overdue";
+    if (diffDays === 0) return "today";
+    if (diffDays <= 3) return "soon";
+    return null;
+}
+
+const URGENCY_ICONS: Record<string, string> = {
+    overdue: "🚨",
+    today: "⚠️",
+    soon: "⏰",
+};
+
+const URGENCY_LABELS: Record<string, string> = {
+    overdue: "overdue",
+    today: "due today",
+    soon: "due soon",
+};
+
+const URGENCY_BADGE_COLORS: Record<string, string> = {
+    overdue: "bg-red-100 text-red-700",
+    today: "bg-orange-100 text-orange-700",
+    soon: "bg-yellow-100 text-yellow-700",
 };
 
 export default function KawaiiCalendar() {
@@ -93,7 +127,7 @@ export default function KawaiiCalendar() {
 
         const loaded: Task[] = data.map(row => ({
             id: row.id.toString(),
-            name: row.name,
+            task_details: row.task_details,
             is_complete: row.is_complete,
             created_at: row.created_at,
             task_title: row.task_title,
@@ -124,7 +158,7 @@ export default function KawaiiCalendar() {
         const loaded: Event[] = data.map(row => ({
             id: row.event_id.toString(),
             name: row.event_name,
-            date: new Date(row.event_date),
+            date: parseLocalDate(row.event_date),
             time: row.event_time ?? "12:00",
             category: row.event_category,
             notes: row.notes ?? "",
@@ -236,7 +270,7 @@ export default function KawaiiCalendar() {
 
     const selectedDayTasks = modal.date
         ? tasks.filter(t =>
-            t.task_deadline && isSameDay(new Date(t.task_deadline), modal.date!)
+            t.task_deadline && isSameDay(parseLocalDate(t.task_deadline), modal.date!)
         )
         : [];
 
@@ -294,9 +328,19 @@ export default function KawaiiCalendar() {
                                 const inMonth = isSameMonth(day, current);
                                 const dayEvents = events.filter(e => isSameDay(e.date, day));
                                 const dayTasks = tasks.filter(t =>
-                                    t.task_deadline && isSameDay(new Date(t.task_deadline), day)
+                                    t.task_deadline && isSameDay(parseLocalDate(t.task_deadline), day)
                                 );
                                 const allItems = [...dayEvents, ...dayTasks];
+
+                                // Highest urgency icon for the cell
+                                const urgencies = dayTasks
+                                    .filter(t => !t.is_complete && t.task_deadline)
+                                    .map(t => getDeadlineUrgency(t.task_deadline))
+                                    .filter(Boolean);
+                                const topUrgency = urgencies.includes("overdue") ? "overdue"
+                                    : urgencies.includes("today") ? "today"
+                                        : urgencies.includes("soon") ? "soon"
+                                            : null;
 
                                 return (
                                     <div
@@ -306,17 +350,26 @@ export default function KawaiiCalendar() {
                                             w-full h-[100px] p-1 cursor-pointer transition-colors
                                             ${inMonth ? "opacity-100" : "opacity-40"}`}
                                     >
-                                        <div className={`text-2xl font-black flex justify-center items-center
-                                            w-12 h-12 rounded-2xl transition-colors tracking-tight
-                                            ${isToday
-                                                ? "bg-blue-200 text-[#2E2805] shadow-md shadow-blue-950/10"
-                                                : "text-[#2E2805] hover:bg-[#bfba9ba4]"
-                                            }`}
-                                        >
-                                            {format(day, "d")}
+                                        {/* Date number + urgency icon */}
+                                        <div className="relative">
+                                            <div className={`text-2xl font-black flex justify-center items-center
+                                                w-12 h-12 rounded-2xl transition-colors tracking-tight
+                                                ${isToday
+                                                    ? "bg-blue-200 text-[#2E2805] shadow-md shadow-blue-950/10"
+                                                    : "text-[#2E2805] hover:bg-[#bfba9ba4]"
+                                                }`}
+                                            >
+                                                {format(day, "d")}
+                                            </div>
+                                            {/* Urgency icon badge on top-right of date */}
+                                            {topUrgency && (
+                                                <span className="absolute -top-1 -right-1 text-[10px] leading-none">
+                                                    {URGENCY_ICONS[topUrgency]}
+                                                </span>
+                                            )}
                                         </div>
 
-                                        {/* Show events first */}
+                                        {/* Events */}
                                         {dayEvents.slice(0, 2).map(ev => (
                                             <div
                                                 key={ev.id}
@@ -327,21 +380,23 @@ export default function KawaiiCalendar() {
                                             </div>
                                         ))}
 
-                                        {/* Fill remaining slots with tasks */}
-                                        {dayEvents.length < 2 && dayTasks.slice(0, 2 - dayEvents.length).map(t => (
-                                            <div
-                                                key={t.id}
-                                                className={`mt-0.5 text-[11px] font-semibold tracking-wide rounded px-1 truncate w-full text-center shadow-sm
-                                                    ${t.is_complete
-                                                        ? "bg-gray-200 text-gray-500 line-through"
-                                                        : (TASK_DIFFICULTY_COLORS[t.task_difficulty] ?? "bg-orange-200 text-orange-800")
-                                                    }`}
-                                            >
-                                                {t.task_title}
-                                            </div>
-                                        ))}
+                                        {/* Tasks filling remaining slots */}
+                                        {dayEvents.length < 2 && dayTasks.slice(0, 2 - dayEvents.length).map(t => {
+                                            const urgency = t.is_complete ? null : getDeadlineUrgency(t.task_deadline);
+                                            return (
+                                                <div
+                                                    key={t.id}
+                                                    className={`mt-0.5 text-[11px] font-semibold tracking-wide rounded px-1 truncate w-full text-center shadow-sm
+                                                        ${t.is_complete
+                                                            ? "bg-gray-200 text-gray-500 line-through"
+                                                            : (TASK_DIFFICULTY_COLORS[t.task_difficulty] ?? "bg-orange-200 text-orange-800")
+                                                        }`}
+                                                >
+                                                    {urgency ? URGENCY_ICONS[urgency] : ""} {t.task_title}
+                                                </div>
+                                            );
+                                        })}
 
-                                        {/* Overflow count */}
                                         {allItems.length > 2 && (
                                             <div className="text-[10px] font-medium text-[#2e2805a8] mt-0.5">
                                                 +{allItems.length - 2} more
@@ -354,10 +409,7 @@ export default function KawaiiCalendar() {
 
                         {/* Cat — bottom right */}
                         <div className="absolute bottom-2 right-4 z-10">
-                            <img
-                                src="/animal_placeholder.png"
-                                className="w-28 h-28 object-contain"
-                            />
+                            <img src="/animal_placeholder.png" className="w-28 h-28 object-contain" />
                         </div>
                     </div>
                 </div>
@@ -383,8 +435,7 @@ export default function KawaiiCalendar() {
                                     ) : (
                                         <ul className="space-y-2 max-h-48 overflow-y-auto">
                                             {selectedDayEvents.map(ev => (
-                                                <li key={ev.id}
-                                                    className="bg-white px-4 py-3 flex items-start justify-between gap-2">
+                                                <li key={ev.id} className="bg-white px-4 py-3 flex items-start justify-between gap-2">
                                                     <div className="flex-1 min-w-0">
                                                         <div className="flex items-center gap-2">
                                                             <span className={`text-[10px] font-bold tracking-wide uppercase px-2 py-0.5 shadow-sm rounded-full ${CATEGORY_COLORS[ev.category]}`}>
@@ -415,27 +466,36 @@ export default function KawaiiCalendar() {
                                         <div>
                                             <p className="text-xs font-extrabold tracking-widest uppercase text-[#2e2805a8] mb-1">Tasks Due</p>
                                             <ul className="space-y-2 max-h-40 overflow-y-auto">
-                                                {selectedDayTasks.map(t => (
-                                                    <li key={t.id} className="bg-white px-4 py-3 flex items-start gap-2">
-                                                        <div className="flex-1 min-w-0">
-                                                            <div className="flex items-center gap-2">
-                                                                <span className={`text-[10px] font-bold tracking-wide uppercase px-2 py-0.5 shadow-sm rounded-full
-                                                                    ${TASK_DIFFICULTY_COLORS[t.task_difficulty] ?? "bg-orange-200 text-orange-800"}`}>
-                                                                    {t.task_difficulty}
-                                                                </span>
-                                                                {t.is_complete && (
-                                                                    <span className="text-[10px] font-bold tracking-wide uppercase px-2 py-0.5 shadow-sm rounded-full bg-gray-200 text-gray-500">
-                                                                        done
+                                                {selectedDayTasks.map(t => {
+                                                    const urgency = t.is_complete ? null : getDeadlineUrgency(t.task_deadline);
+                                                    return (
+                                                        <li key={t.id} className="bg-white px-4 py-3 flex items-start gap-2">
+                                                            <div className="flex-1 min-w-0">
+                                                                <div className="flex items-center gap-2 flex-wrap">
+                                                                    <span className={`text-[10px] font-bold tracking-wide uppercase px-2 py-0.5 shadow-sm rounded-full
+                                                                        ${TASK_DIFFICULTY_COLORS[t.task_difficulty] ?? "bg-orange-200 text-orange-800"}`}>
+                                                                        {t.task_difficulty}
                                                                     </span>
-                                                                )}
+                                                                    {urgency && (
+                                                                        <span className={`text-[10px] font-bold tracking-wide uppercase px-2 py-0.5 shadow-sm rounded-full
+                                                                            ${URGENCY_BADGE_COLORS[urgency]}`}>
+                                                                            {URGENCY_ICONS[urgency]} {URGENCY_LABELS[urgency]}
+                                                                        </span>
+                                                                    )}
+                                                                    {t.is_complete && (
+                                                                        <span className="text-[10px] font-bold tracking-wide uppercase px-2 py-0.5 shadow-sm rounded-full bg-gray-200 text-gray-500">
+                                                                            ✓ done
+                                                                        </span>
+                                                                    )}
+                                                                </div>
+                                                                <p className={`font-black tracking-tight text-[#2e2805] text-sm mt-1 truncate
+                                                                    ${t.is_complete ? "line-through opacity-50" : ""}`}>
+                                                                    {t.task_title}
+                                                                </p>
                                                             </div>
-                                                            <p className={`font-black tracking-tight text-[#2e2805] text-sm mt-1 truncate
-                                                                ${t.is_complete ? "line-through opacity-50" : ""}`}>
-                                                                {t.task_title}
-                                                            </p>
-                                                        </div>
-                                                    </li>
-                                                ))}
+                                                        </li>
+                                                    );
+                                                })}
                                             </ul>
                                         </div>
                                     )}
