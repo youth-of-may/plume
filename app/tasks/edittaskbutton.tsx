@@ -82,7 +82,7 @@ export default function EditTaskButton({ task, difficulties }: EditTaskButtonPro
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="font-delius p-2 bg-[#ADD3EA] rounded-4xl font-bold text-[#2E2805] border-3 border-[#8FBCD6]"
+        className="font-delius px-4 py-2 mt-2 bg-[#ADD3EA] rounded-xl font-bold border-3 border-[#8FBCD6]"
       >
         Edit Task
       </button>
@@ -94,7 +94,7 @@ export default function EditTaskButton({ task, difficulties }: EditTaskButtonPro
               <p className="text-red-500 text-sm">{errorMsg}</p>
             )}
 
-            Task Name
+            <h4 className="font-bold text-lg">TASK NAME</h4>
             <input
               type="text"
               placeholder="Input name"
@@ -103,29 +103,34 @@ export default function EditTaskButton({ task, difficulties }: EditTaskButtonPro
               className="border-b-3 border-[#F0B6CF] p-2"
             />
             
-            Details
+            <h4 className="font-bold text-lg">DETAILS</h4>
             <textarea
               placeholder="Details"
               value={details}
               onChange={(e) => setDetails(e.target.value)}
-              className="border-b-3 border-[#F0B6CF] p-2"
-            />
-
-            Date
-            <input
-                type="date"
-                value={deadlineDate}
-                onChange={(e) => setDeadlineDate(e.target.value)}
-                className="border-b-3 border-[#F0B6CF] p-2 flex-1"
-              />
-              Due Time
-              <input
-                type="time"
-                value={deadlineTime}
-                onChange={(e) => setDeadlineTime(e.target.value)}
-                className="border-b-3 border-[#F0B6CF] p-2 flex-1"
-              />
+              className="border-b-3 border-[#F0B6CF] p-2"/>
+              
+            <div className="flex gap-3">
+              <div>
+                <h4 className="font-bold text-lg">DATE</h4>
+                <input
+                    type="date"
+                    value={deadlineDate}
+                    onChange={(e) => setDeadlineDate(e.target.value)}
+                    className="border-b-3 border-[#F0B6CF] p-2 mt-3 flex-1"/>
+              </div>
+                <div>
+                  <h4 className="font-bold text-lg">DUE TIME</h4>
+                  <input
+                    type="time"
+                    value={deadlineTime}
+                    onChange={(e) => setDeadlineTime(e.target.value)}
+                    className="border-b-3 border-[#F0B6CF] p-2 mt-3 flex-1"
+                  />
+                </div>
+              </div>
             
+            <h4 className="font-bold text-lg">DIFFICULTY</h4>
             <select
               value={difficulty}
               onChange={(e) => setDifficulty(e.target.value)}

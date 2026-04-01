@@ -169,26 +169,32 @@ export default function TaskListClient({
     <ul>
         {tasks.map((task) => (
         <li key={task.id}>
-            <strong style={{ marginRight: "48px" }}>{task.task_title}</strong>
-            {" "}Difficulty: {task.task_difficulty}
-            {" "}<EditTaskButton task={task} difficulties={difficulties} />
-            <p>{task.task_details}</p>
-
-            {mode === "pending" && task.task_deadline && (
+          <div className="flex items-start gap-3 mt-4">
+              <input type="checkbox" className="appearance-none w-10 h-10 border-4 border-[#CCC38D] rounded-lg
+             checked:bg-[#ADD3EA] checked:border-[#ADD3EA]
+             checked:before:content-['✔'] checked:before:text-white
+             checked:before:flex checked:before:items-center checked:before:justify-center
+             checked:before:text-2xl"
+                checked={mode !== "pending"} onChange={(e) => updateTaskStatus(task.id, e.target.checked)}/>
             <div>
-                <p>Due: {formatDate(task.task_deadline)}</p>
-                {getDeadlineMessage(task.task_deadline)}
-            </div>
-            )}
+              <strong style={{ marginRight: "48px" }}>{task.task_title}</strong>
+              {" "}Difficulty: {task.task_difficulty}
+              <p>{task.task_details}</p>
 
-            {mode === "completed" && (
-                <p>Date Completed: {formatDate(task.completion_datetime)}</p>
-            )}
-            
-            <p><button onClick={() => updateTaskStatus(task.id, mode === "pending")}>
-                {mode === "pending" ? "Mark as Completed" : "Mark as Incomplete"}
-            </button></p>
-            <br />
+              {mode === "pending" && task.task_deadline && (
+              <div>
+                  <p>Due: {formatDate(task.task_deadline)}</p>
+                  {getDeadlineMessage(task.task_deadline)}
+              </div>
+              )}
+
+              {mode === "completed" && (
+                  <p>Date Completed: {formatDate(task.completion_datetime)}</p>
+              )}
+              {" "}<EditTaskButton task={task} difficulties={difficulties} />
+            </div>
+          </div>
+          <hr className="block my-6 w-9/10 border-t-2 border-[#CCC38D] rounded-lg"/>
         </li>
         ))}
     </ul>
