@@ -82,7 +82,7 @@ export default function EditTaskButton({ task, difficulties }: EditTaskButtonPro
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="font-delius p-4 bg-[#ADD3EA] rounded-xl font-bold"
+        className="font-delius px-4 py-2 mt-2 bg-[#ADD3EA] rounded-xl font-bold text-xs"
       >
         Edit Task
       </button>
