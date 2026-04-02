@@ -38,8 +38,10 @@ export default async function Archive({
   return (
     <div className="flex flex-col mx-16 mt-30">
       
-      <div className='gap-8 bg-[#FBF5D1] p-4 rounded-b-lg rounded-e-lg border-4 border-[#CCC38D]'>
-        <ArchiveList entries={entries}/>
+      <div className='gap-8 bg-[#FBF5D1] p-10 rounded-b-lg rounded-e-lg border-4 border-[#CCC38D]'>
+        <div className="bg-white border-2 border-[#CCC38D] rounded-lg">
+          <ArchiveList entries={entries}/>
+        </div>
       </div>
     </div>
   )
