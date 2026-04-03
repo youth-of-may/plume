@@ -51,55 +51,39 @@ export default async function Inventory() {
   const accessories = await getUserAccessories();
   return (
     <>
-      <BodyBackground style="repeating-linear-gradient(90deg, #c08350 0px, #c08350 40px, #f0c09a 40px, #f0c09a 80px)" />
+       <BodyBackground style="repeating-linear-gradient(90deg, #c08350 0px, #c08350 40px, #f0c09a 40px, #f0c09a 80px)" />
 
-      <header className="w-full bg-[#FBF5D1] px-[50px] py-[20px]">
-        <h2 className="text-right text-[#163F55] text-5xl font-cherry">
+      <header className="w-full bg-[#FBF5D1] px-12 py-10">
+        <h2 className="text-right text-[#2E2805] text-5xl font-cherry">
           Inventory
         </h2>
       </header>
 
-      <div className="flex grid-cols-4 gap-4 p-8 border-b-80 border-solid border-b-[#eecc8e] inset-ring-4 inset-ring-[#FBF5D1]">
-        {accessories?.map((acc) => (
-          <div key={acc.accessory_id}>
-            <h1>{acc.accessory_name}</h1>
-            <Image
-              src={acc.accessory_url}
-              alt={acc.accessory_name}
-              width={80}
-              height={80}
-            />
-          </div>
-        ))}
-      </div>
+      <div className="grid grid-cols-4 inset-ring-4 inset-ring-[#FBF5D1] font-delius w-full border-b-180 border-[#FBF5D1]">
+          {accessories?.map((acc, index) => (
+            <>
+              <div className="bg-[#ADD3EA] pt-4 px-4 mt-5 rounded-xl border-4 border-[#FBF5D1] w-40 translate-y-4 -z-4 justify-self-center">
+                <h1 className="font-black text-center">{acc.accessory_name}</h1>
+                <Image
+                  src={acc.accessory_url}
+                  alt={acc.accessory_name}
+                  width={80}
+                  height={80}
+                  className="place-self-center"
+                />
+              </div>
 
-      <div className="flex grid-cols-4 gap-4 p-8 border-b-80 border-solid border-b-[#eecc8e] inset-ring-4 inset-ring-[#FBF5D1]">
-        {accessories?.map((acc) => (
-          <div key={acc.accessory_id}>
-            <h1>{acc.accessory_name}</h1>
-            <Image
-              src={acc.accessory_url}
-              alt={acc.accessory_name}
-              width={80}
-              height={80}
-            />
-          </div>
-        ))}
-      </div>
-
-      <div className="flex grid-cols-4 gap-4 p-8 border-b-80 border-solid border-b-[#eecc8e] inset-ring-4 inset-ring-[#FBF5D1]">
-        {accessories?.map((acc) => (
-          <div key={acc.accessory_id}>
-            <h1>{acc.accessory_name}</h1>
-            <Image
-              src={acc.accessory_url}
-              alt={acc.accessory_name}
-              width={80}
-              height={80}
-            />
-          </div>
-        ))}
-      </div>
+          {(index + 1) % 4 === 0 && (
+            <>
+            <div className="col-span-4 border-b-100 border-[#EFE8C1]"></div>
+            <div className="col-span-4 border-b-50 border-[#FBF5D1]"></div>
+            </>
+          )}
+            </>
+          ))}
+          <div className="col-span-4 border-b-100 border-[#EFE8C1]"></div>
+            <div className="col-span-4 border-b-50 border-[#FBF5D1]"></div>
+        </div>  
     </>
   );
 }
