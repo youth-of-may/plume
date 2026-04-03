@@ -27,7 +27,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
+      <body suppressHydrationWarning
         className={`${cherry.variable} ${delius.variable} flex flex-row antialiased`}
       >
         <Navbar />
