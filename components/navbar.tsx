@@ -134,8 +134,8 @@ function FullNav() {
         <nav className="flex flex-col items-center w-full gap-4 font-delius">
           <NavLink href="/" label="home" />
           <NavLink href="/journal" label="write entry" />
-          <NavLink href="/journal" label="journal archive" />
-          <NavLink href="/" label="calendar" />
+          <NavLink href="/archive" label="journal archive" />
+          <NavLink href="/calendar" label="calendar" />
           <NavLink href="/tasks" label="task list" />
           <NavLink href="/" label="shop" />
           <NavLink href="/" label="gacha" />
