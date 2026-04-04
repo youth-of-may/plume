@@ -131,8 +131,8 @@ async function CharacterPanel({
   }
 
   return (
-    <div className="p-6 bg-[#F0B6CF] flex flex-col col-span-2 ms-20 items-center h-52 translate-y-1 shadow-md">
-        <Image src={character.pet.pet_model} alt={character.pet.pet_type} width={190} height={190} className="-translate-y-1.5" />
+    <div className="p-6 bg-linear-to-b to-[#EF87BE] from-[#FFCEE6] flex flex-col col-span-2 ms-20 items-center h-52 translate-y-1 shadow-lg border-5 border-[#F0B6CF]">
+        <Image src={character.pet.pet_model} alt={character.pet.pet_type} width={200} height={200} className="-translate-y-6.5" />
     </div>
   );
 }
