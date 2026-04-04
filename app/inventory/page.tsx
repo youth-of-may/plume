@@ -2,12 +2,9 @@ import { createClient } from "@/utils/supabase/server";
 import Image from "next/image";
 import { cookies } from "next/headers";
 import BodyBackground from "./body_background";
-
+import ModalWithTrigger from "./inventory_modal";
 
 export async function getUserAccessories() {
-
-  'use server'
-
   const cookieStore = cookies();
   const supabase = await createClient(cookieStore);
 
@@ -15,22 +12,19 @@ export async function getUserAccessories() {
 
   if (!user) {
     console.log("No user logged in");
-    return;
+    return [];
   }
-
-  console.log(user.id)
 
   const { data: ownedAccessories, error: ownedError } = await supabase
     .from("accessory_owned")
     .select("accessory_id")
     .eq("user_id", user.id);
 
-  if (ownedError) {
-    console.error(ownedError.message);
-    return;
+  if (ownedError || !ownedAccessories) {
+    console.error(ownedError?.message);
+    return [];
   }
 
-  console.log(ownedAccessories)
   const accessoryIds = ownedAccessories.map(a => a.accessory_id);
 
   const { data: accessories, error: accessoryError } = await supabase
@@ -38,20 +32,20 @@ export async function getUserAccessories() {
     .select("*")
     .in("accessory_id", accessoryIds);
 
-  if (accessoryError) {
-    console.error(accessoryError.message);
-    return;
+  if (accessoryError || !accessories) {
+    console.error(accessoryError?.message);
+    return [];
   }
 
-  console.log(accessories)
   return accessories;
 }
 
 export default async function Inventory() {
   const accessories = await getUserAccessories();
+
   return (
     <>
-       <BodyBackground style="repeating-linear-gradient(90deg, #c08350 0px, #c08350 40px, #f0c09a 40px, #f0c09a 80px)" />
+      <BodyBackground style="repeating-linear-gradient(90deg, #c08350 0px, #c08350 40px, #f0c09a 40px, #f0c09a 80px)" />
 
       <header className="w-full bg-[#FBF5D1] px-12 py-10">
         <h2 className="text-right text-[#2E2805] text-5xl font-cherry">
@@ -60,30 +54,36 @@ export default async function Inventory() {
       </header>
 
       <div className="grid grid-cols-4 inset-ring-4 inset-ring-[#FBF5D1] font-delius w-full border-b-180 border-[#FBF5D1]">
-          {accessories?.map((acc, index) => (
-            <>
-              <div className="bg-[#ADD3EA] pt-4 px-4 mt-5 rounded-xl border-4 border-[#FBF5D1] w-40 translate-y-4 -z-4 justify-self-center">
-                <h1 className="font-black text-center">{acc.accessory_name}</h1>
-                <Image
-                  src={acc.accessory_url}
-                  alt={acc.accessory_name}
-                  width={80}
-                  height={80}
-                  className="place-self-center"
-                />
-              </div>
+        {accessories.map((acc, index) => (
+          <div key={acc.accessory_id}>
+            <div className="bg-[#ADD3EA] pt-4 px-4 mt-5 rounded-xl border-4 border-[#FBF5D1] w-40 mt-4 z-0 justify-self-center">
+              <h1 className="font-black text-center">
+                {acc.accessory_name}
+              </h1>
 
-          {(index + 1) % 4 === 0 && (
-            <>
-            <div className="col-span-4 border-b-100 border-[#EFE8C1]"></div>
-            <div className="col-span-4 border-b-50 border-[#FBF5D1]"></div>
-            </>
-          )}
-            </>
-          ))}
-          <div className="col-span-4 border-b-100 border-[#EFE8C1]"></div>
-            <div className="col-span-4 border-b-50 border-[#FBF5D1]"></div>
-        </div>  
+              <Image
+                src={acc.accessory_url}
+                alt={acc.accessory_name}
+                width={80}
+                height={80}
+                className="place-self-center"
+              />
+
+              <ModalWithTrigger acc={acc}/>
+            </div>
+
+            {(index + 1) % 4 === 0 && (
+              <>
+                <div className="col-span-4 z-[1] border-b-100 border-[#EFE8C1]" />
+                <div className="col-span-4 z-[1] border-b-50 border-[#FBF5D1]" />
+              </>
+            )}
+          </div>
+        ))}
+
+        <div className="col-span-4 z-[1] border-b-100 border-[#EFE8C1]" />
+        <div className="col-span-4 z-[1] border-b-50 border-[#FBF5D1]" />
+      </div>
     </>
   );
 }
