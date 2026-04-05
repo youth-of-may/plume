@@ -43,21 +43,32 @@ export async function getUserAccessories() {
 export default async function Inventory() {
   const accessories = await getUserAccessories();
 
+  const divideIntoRows = <T,>(arr: T[], size: number): T[][] =>
+    Array.from({ length: Math.ceil(arr.length / size) }, (_, i) =>
+      arr.slice(i * size, i * size + size)
+    );
+
+  const rows = divideIntoRows(accessories, 4);
+
   return (
-    <>
-      <BodyBackground style="repeating-linear-gradient(90deg, #c08350 0px, #c08350 40px, #f0c09a 40px, #f0c09a 80px)" />
+  <>
+    <BodyBackground style="repeating-linear-gradient(90deg, #c08350 0px, #c08350 40px, #f0c09a 40px, #f0c09a 80px)" />
 
-      <header className="w-full bg-[#FBF5D1] px-12 py-10">
-        <h2 className="text-right text-[#2E2805] text-5xl font-cherry">
-          Inventory
-        </h2>
-      </header>
+    <header className="w-full bg-[#FBF5D1] px-12 py-10">
+      <h2 className="text-right text-[#2E2805] text-5xl font-cherry">
+        Inventory
+      </h2>
+    </header>
 
-      <div className="grid grid-cols-4 inset-ring-4 inset-ring-[#FBF5D1] font-delius w-full border-b-180 border-[#FBF5D1]">
-        {accessories.map((acc, index) => (
-          <div key={acc.accessory_id}>
-            <div className="bg-[#ADD3EA] pt-4 px-4 mt-5 rounded-xl border-4 border-[#FBF5D1] w-40 mt-4 z-0 justify-self-center">
-              <h1 className="font-black text-center">
+    <div className="flex flex-col py-1 inset-ring-4 inset-ring-[#FBF5D1] font-delius w-full border-b-180 border-[#FBF5D1]">
+      {rows.map((group, rowIndex) => (
+        <div key={rowIndex} className="grid grid-cols-4">
+          {group.map((acc) => (
+            <div
+              key={acc.accessory_id}
+              className="bg-[#ADD3EA] pt-4 px-4 mt-5 rounded-t-xl border-x-4 border-t-4 border-[#FBF5D1] h-40 w-40 justify-self-center"
+            >
+              <h1 className="font-black text-center h-10">
                 {acc.accessory_name}
               </h1>
 
@@ -66,24 +77,21 @@ export default async function Inventory() {
                 alt={acc.accessory_name}
                 width={80}
                 height={80}
-                className="place-self-center"
+                className="place-self-center h-20 w-20"
               />
 
-              <ModalWithTrigger acc={acc}/>
+              <ModalWithTrigger acc={acc} />
             </div>
+          ))}
 
-            {(index + 1) % 4 === 0 && (
-              <>
-                <div className="col-span-4 z-[1] border-b-100 border-[#EFE8C1]" />
-                <div className="col-span-4 z-[1] border-b-50 border-[#FBF5D1]" />
-              </>
-            )}
-          </div>
-        ))}
-
-        <div className="col-span-4 z-[1] border-b-100 border-[#EFE8C1]" />
-        <div className="col-span-4 z-[1] border-b-50 border-[#FBF5D1]" />
-      </div>
-    </>
-  );
-}
+          {rowIndex < rows.length - 1 && (
+            <>
+              <div className="col-span-4 border-b-100 border-[#EFE8C1]" />
+              <div className="col-span-4 border-b-50 border-[#FBF5D1]" />
+            </>
+          )}
+        </div>
+      ))}
+    </div>
+  </>
+  )}

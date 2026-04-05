@@ -20,9 +20,9 @@ export default function ModalWithTrigger({ acc }: { acc: Accessory }) {
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="px-4 py-2 bg-blue-500 text-white rounded-lg"
+        className="px-4 py-2 hover:text-white -translate-y-5"
       >
-        Open Modal
+        Details
       </button>
 
       {isOpen && (
@@ -70,10 +70,9 @@ export default function ModalWithTrigger({ acc }: { acc: Accessory }) {
                 Rare
               </div>
               <h2
-                className="text-3xl font-black text-[#2E2805] leading-tight"
-                style={{ fontFamily: "Georgia, serif" }}
+                className="text-3xl font-black font-cherry text-[#2E2805] leading-tight"
               >
-                Inventory Item
+                { acc.accessory_name }
               </h2>
             </div>
 
