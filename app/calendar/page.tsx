@@ -363,7 +363,7 @@ export default function KawaiiCalendar() {
                                             </div>
                                             {/* Urgency icon badge on top-right of date */}
                                             {topUrgency && (
-                                                <span className="absolute -top-1 -right-1 text-[10px] leading-none">
+                                                <span className="absolute -top-2 -right-3 text-[20px] leading-none">
                                                     {URGENCY_ICONS[topUrgency]}
                                                 </span>
                                             )}
