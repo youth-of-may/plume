@@ -41,6 +41,15 @@ export default function ModalWithTrigger({ acc }: { acc: Accessory }) {
         return;
       }
 
+      const { data: userData } = await supabase
+    .from("users")
+    .select("exp_points")
+    .eq("id", user.id)
+    .single();
+
+      const refundExp = Math.floor(acc.accessory_exp / 4);
+      const newEXP = user.userEXP + refundExp;
+
       const { error } = await supabase
         .from("accessory_owned")
         .delete()
@@ -49,6 +58,18 @@ export default function ModalWithTrigger({ acc }: { acc: Accessory }) {
 
       if (error) {
         console.error("Delete failed:", error.message);
+        return;
+      }
+
+      const { error: updateError } = await supabase
+      .from("users")
+      .update({
+        exp_points: supabase.sql`exp_points + ${refundExp}`,
+      })
+      .eq("id", user.id);
+
+      if (updateError) {
+        console.error("EXP update failed:", updateError.message);
         return;
       }
 
