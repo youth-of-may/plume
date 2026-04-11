@@ -114,7 +114,7 @@ async function CharacterPanel({
   }
 
   return (
-    <div className="flex flex-col items-end -translate-y-147 -translate-x-20">
+    <div className="flex flex-col items-end -translate-y-147 -translate-x-20 -z-1">
         <Image src={character.pet.pet_model} alt={character.pet.pet_type} width={150} height={150}/>
     </div>
   );
