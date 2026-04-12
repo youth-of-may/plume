@@ -326,6 +326,14 @@ export default async function Shop() {
   const userexp = await getUserExp();
   const ownedAccessories = await getOwnedAccesoriesID() ?? []
   const ownedSet = new Set(ownedAccessories.map(a => a.accessory_id))
+  const rarityOrder: Record<string, number> = {
+    Epic: 0,
+    Rare: 1,
+    Common: 2,
+  };
+  const sortedAccessories = [...accessories].sort(
+    (a, b) => (rarityOrder[a.accessory_rarity] ?? 99) - (rarityOrder[b.accessory_rarity] ?? 99)
+  )
   
   const divideIntoRows = <T,>(arr: T[]): T[][] => {
   if (arr.length <= 2) return [arr];
@@ -334,7 +342,7 @@ export default async function Shop() {
   )];
 };
 
-const rows = divideIntoRows(accessories);
+const rows = divideIntoRows(sortedAccessories);
   const rarity: Record<string, { bg: string; text: string }> = {
     Common:   { bg: "bg-[#D0E8F7]", text: "text-[#163F55]" },
     Rare:     { bg: "bg-[#FFEDF5]", text: "text-[#E37FAA]" },
