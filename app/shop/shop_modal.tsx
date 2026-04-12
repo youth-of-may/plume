@@ -58,17 +58,6 @@ export default function ModalWithTrigger({ acc }: { acc: Accessory }) {
             <span className="absolute bottom-4 left-4 w-3 h-3 rounded-full bg-[#c08350] opacity-60" />
             <span className="absolute bottom-4 right-4 w-3 h-3 rounded-full bg-[#c08350] opacity-60" />
 
-            {/* Close button */}
-            <button
-              onClick={() => setIsOpen(false)}
-              className="absolute top-2 right-2 w-12 h-12 rounded-full flex items-center justify-center font-black text-sm transition-colors block md:hidden"
-              style={{ backgroundColor: "#c08350", color: "#FBF5D1" }}
-              onMouseOver={e => (e.currentTarget.style.backgroundColor = "#8b5c30")}
-              onMouseOut={e => (e.currentTarget.style.backgroundColor = "#c08350")}
-            >
-              ✕
-            </button> 
-
             {/* Header */}
             <div className="text-center mb-6">
               <div className={`inline-block px-4 py-1 rounded-full text-xs font-black uppercase tracking-widest mb-3 
@@ -129,6 +118,12 @@ export default function ModalWithTrigger({ acc }: { acc: Accessory }) {
 
             {/* Footer button */}
             <div className="mt-8 flex justify-center">
+              <button
+                className="px-8 py-3 rounded-xl font-black text-sm uppercase tracking-widest transition-colors hidden md:block"
+                style={{ backgroundColor: "#c08350", color: "#FBF5D1", border: "3px solid #8b5c30" }}
+                >
+                Buy
+              </button>
               <button
                 onClick={() => setIsOpen(false)}
                 className="px-8 py-3 rounded-xl font-black text-sm uppercase tracking-widest transition-colors hidden md:block"
