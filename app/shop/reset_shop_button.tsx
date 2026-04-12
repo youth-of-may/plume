@@ -7,9 +7,11 @@ export default function ResetShopButton({ userexp }: { userexp: number }) {
   const [isOpen, setIsOpen] = useState(false);
 
   const canAfford = userexp >= 1000
+  const supabase = createClient()
+  const router = useRouter()
+
   async function resetShop(){
-    const supabase = createClient()
-    const router = useRouter()
+
 
     const { data: { user }, error: userError } = await supabase.auth.getUser()
     if (userError || !user) return
@@ -32,6 +34,9 @@ export default function ResetShopButton({ userexp }: { userexp: number }) {
       if(profileUpdate.error){
         return
       }
+    
+    setIsOpen(false)
+    router.refresh()
   }
 }
 
@@ -77,7 +82,7 @@ export default function ResetShopButton({ userexp }: { userexp: number }) {
               </button>
 
               <button
-                onClick={() => setIsOpen(false)}
+                onClick={() => resetShop()}
                 className="rounded-2xl border-4 border-[#D7B87F] bg-[#F5E8A0] px-5 py-2 font-delius font-bold text-[#2E2805] shadow-sm"
               >
                 Confirm Reset
