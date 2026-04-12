@@ -41,6 +41,26 @@ export async function getAccessories() {
   return accessories;
 }
 
+export async function getOwnedAccesoriesID(){
+  'use server'
+  const cookieStore = cookies();
+  const supabase = await createClient(cookieStore);
+
+  const { data: { user }, error: userError } = await supabase.auth.getUser()
+  if (userError || !user) return
+
+  const { data: ownedAccessories, error } = await supabase
+    .from("accessory_owned")
+    .select("accessory_id")
+    .eq("user_id", user.id);
+
+  if(error){
+    return;
+  }
+
+  return ownedAccessories;
+}
+
 async function getCharacterSummary(): Promise<CharacterResult> {
   const supabase = await createClient();
 
@@ -164,6 +184,9 @@ export default async function Shop() {
   const accessories = await getAccessories();
   const character = getCharacterSummary();
   const userexp = await getUserExp();
+  const ownedAccessories = await getOwnedAccesoriesID() ?? []
+  const ownedSet = new Set(ownedAccessories.map(a => a.accessory_id))
+  
   const divideIntoRows = <T,>(arr: T[]): T[][] => {
   if (arr.length <= 2) return [arr];
   return [arr.slice(0, 2), ...Array.from({ length: Math.ceil((arr.length - 2) / 4) }, (_, i) =>
@@ -178,7 +201,7 @@ const rows = divideIntoRows(accessories);
     Epic:     { bg: "bg-yellow-200", text: "text-yellow-800" },
   };
 
-  return (
+return (
     <>
        <BodyBackground style="repeating-linear-gradient(90deg, #c08350 0px, #c08350 40px, #f0c09a 40px, #f0c09a 80px)" />
 
@@ -200,34 +223,39 @@ const rows = divideIntoRows(accessories);
       <div className="flex flex-col py-1 inset-ring-4 inset-ring-[#FBF5D1] font-delius w-full border-b-180 border-[#FBF5D1]">
       {rows.map((group, rowIndex) => (
         <div key={rowIndex} className="grid grid-cols-4">
-          {group.map((acc) => (
-            <div
-              key={acc.accessory_id}
-              className={` pt-4 px-4 mt-5 rounded-t-xl border-x-4 border-t-4 border-[#FBF5D1] h-50 w-50 justify-self-center
-                ${rarity[acc.accessory_rarity]?.bg} 
-                  ${rarity[acc.accessory_rarity]?.text}`}
-            >
-              <h1 className="font-black text-center h-15 text-xl">
-                {acc.accessory_name}
-              </h1>
+          {group.map((acc) => {
+            const isOwned = ownedSet.has(acc.accessory_id);          
+             return (
+                <div
+                  key={acc.accessory_id}
+                  className={` pt-4 px-4 mt-5 rounded-t-xl border-x-4 border-t-4 border-[#FBF5D1] h-50 w-50 justify-self-center
+                    ${rarity[acc.accessory_rarity]?.bg} 
+                      ${rarity[acc.accessory_rarity]?.text}`}
+                >
+                  <h1 className="font-black text-center h-15 text-xl">
+                    {acc.accessory_name}
+                  </h1>
 
-              <Image
-                src={acc.accessory_url}
-                alt={acc.accessory_name}
-                width={80}
-                height={80}
-                className="place-self-center h-25 w-25"
-              />
+                  <Image
+                    src={acc.accessory_url}
+                    alt={acc.accessory_name}
+                    width={80}
+                    height={80}
+                    className="place-self-center h-25 w-25"
+                  />
 
-              <ModalWithTrigger acc={acc} />
+                  <ModalWithTrigger acc={acc} />
 
-              <div className="bg-[#FBF5D1] px-5 mt-4 border-4 border-white rounded-2xl shadow-md">
-                  <h4 className="font-bold">{ acc.accessory_exp }</h4>
+                  <div className="bg-[#FBF5D1] px-5 mt-4 border-4 border-white rounded-2xl shadow-md">
+                      <h4 className="font-bold">{ isOwned ? "OWNED" : acc.accessory_exp }</h4>
+                    </div>
+                  
                 </div>
-              
-            </div>
-            
-          ))}
+                
+              )
+            }
+          
+          )}
            {rowIndex === 0 && (
             <>
             <CharacterPanel getCharacter={character}/>
