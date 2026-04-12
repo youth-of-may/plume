@@ -175,7 +175,7 @@ function FullNav() {
               <NavLink href="/shop" label="shop" />
               <NavLink href="/dashboard" label="dashboard" />
               <NavLink href="/inventory" label="inventory" />
-              <NavLink href="/items" label="item list" />
+              <NavLink href="/pet-customize" label="customization" />
             </nav>
             <div className="flex flex-col items-center">
               <button
