@@ -152,7 +152,7 @@ function FullNav() {
           <button className="font-delius py-2 px-4 bg-[#ADD3EA] border-3 border-[#5e94b67d] rounded-3xl font-bold" onClick={signOut}>Log Out</button>
         </div>
       </div>
-    </div>
+    
   );
 }
 
