@@ -4,6 +4,9 @@ import { createClient } from '@supabase/supabase-js';
 import { render } from '@react-email/render';
 import TaskReminderEmail from '@/emails/TaskReminderEmail';
 import EventReminderEmail from '@/emails/EventReminderEmail';
+import JournalReminderEmail from '@/emails/JournalReminderEmail';
+import { sendInBatches } from '@/utils/emailqueue';
+
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const supabase = createClient(
@@ -12,7 +15,6 @@ const supabase = createClient(
 );
 
 export async function GET(req: Request) {
-    // Protect the cron route
     const authHeader = req.headers.get('authorization');
     if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
         return Response.json({ error: 'Unauthorized' }, { status: 401 });
@@ -36,27 +38,24 @@ export async function GET(req: Request) {
         .gte('event_date', todayDate)
         .order('event_date', { ascending: true });
 
+    // Fetch ALL users for journal blast
+    const { data: { users: allUsers }, error: usersError } = await supabase.auth.admin.listUsers();
+
     if (taskDbError) return Response.json({ error: taskDbError.message }, { status: 500 });
     if (eventDbError) return Response.json({ error: eventDbError.message }, { status: 500 });
+    if (usersError) return Response.json({ error: usersError.message }, { status: 500 });
 
-    // Get all unique user IDs 
+    // Get all unique user IDs for tasks/events
     const userIds = [...new Set([
         ...(tasks ?? []).map(t => t.user_id),
         ...(events ?? []).map(e => e.user_id),
     ])];
 
-    if (userIds.length === 0) return Response.json({ message: 'No users to notify' });
-
-    // Fetch user emails from auth.users via service role 
+    // Build userMap from allUsers (reuse for tasks/events too)
     const userMap: Record<string, string> = {};
-    await Promise.all(
-        userIds.map(async (id) => {
-            const { data } = await supabase.auth.admin.getUserById(id);
-            if (data?.user?.email) {
-                userMap[id] = data.user.email;
-            }
-        })
-    );
+    for (const u of allUsers ?? []) {
+        if (u.email) userMap[u.id] = u.email;
+    }
 
     // Group tasks and events by user 
     const tasksByUser: Record<string, typeof tasks> = {};
@@ -71,9 +70,10 @@ export async function GET(req: Request) {
         eventsByUser[event.user_id]!.push(event);
     }
 
-    // Send emails 
-    const taskResults = await Promise.allSettled(
-        Object.entries(tasksByUser).map(async ([userId, userTasks]) => {
+    // Send task emails
+    const taskResults = await sendInBatches(
+        Object.entries(tasksByUser),
+        async ([userId, userTasks]) => {
             const email = userMap[userId];
             if (!email || !userTasks) return;
 
@@ -85,21 +85,20 @@ export async function GET(req: Request) {
                 task_difficulty: t.task_difficulty as 'hard' | 'medium' | 'easy',
             }));
 
-            const html = await render(
-                TaskReminderEmail({ userName: email, tasks: emailTasks })
-            );
-
+            const html = await render(TaskReminderEmail({ userName: email, tasks: emailTasks }));
             return resend.emails.send({
                 from: 'Plume <plume@codedbymay.com>',
                 to: [email],
                 subject: `You have ${emailTasks.length} upcoming task(s)`,
                 html,
             });
-        })
+        }
     );
 
-    const eventResults = await Promise.allSettled(
-        Object.entries(eventsByUser).map(async ([userId, userEvents]) => {
+    // Send event emails
+    const eventResults = await sendInBatches(
+        Object.entries(eventsByUser),
+        async ([userId, userEvents]) => {
             const email = userMap[userId];
             if (!email || !userEvents) return;
 
@@ -113,24 +112,40 @@ export async function GET(req: Request) {
                 }),
             }));
 
-            const html = await render(
-                EventReminderEmail({ userName: email, events: emailEvents })
-            );
-
+            const html = await render(EventReminderEmail({ userName: email, events: emailEvents }));
             return resend.emails.send({
                 from: 'Plume <plume@codedbymay.com>',
                 to: [email],
                 subject: `You have ${emailEvents.length} upcoming event(s)`,
                 html,
             });
-        })
+        }
     );
+
+    // Send journal reminder to ALL users
+    const journalResults = await sendInBatches(
+        allUsers ?? [],
+        async (user) => {
+            if (!user.email) return;
+            const html = await render(
+                JournalReminderEmail({ userName: user.user_metadata?.name ?? user.email ?? 'there' })
+            );
+            return resend.emails.send({
+                from: 'Plume <plume@codedbymay.com>',
+                to: [user.email],
+                subject: `Your daily journal reminder`,
+                html,
+            });
+        }
+    );
+
 
     return Response.json({
         tasksSent: taskResults.filter(r => r.status === 'fulfilled').length,
         eventsSent: eventResults.filter(r => r.status === 'fulfilled').length,
+        journalSent: journalResults.filter(r => r.status === 'fulfilled').length,
         tasksTotal: tasks?.length ?? 0,
         eventsTotal: events?.length ?? 0,
-        usersNotified: userIds.length,
+        usersTotal: allUsers?.length ?? 0,
     });
 }
