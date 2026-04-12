@@ -5,6 +5,7 @@ import { cookies } from "next/headers";
 import BodyBackground from "./body_background";
 import ModalWithTrigger from "./shop_modal";
 import ResetTimer from "./reset_timer"
+import ResetShopButton from "./reset_shop_button";
 
 type PetData = {
   pet_model: string;
@@ -256,8 +257,10 @@ async function getCharacterSummary(): Promise<CharacterResult> {
 
 async function CharacterPanel({
   getCharacter,
+  userexp,
 }: {
   getCharacter: Promise<CharacterResult>;
+  userexp: number | null;
 }) {
   const data = await getCharacter;
 
@@ -295,11 +298,7 @@ async function CharacterPanel({
   return (
     <div className="relative p-6 bg-linear-to-b to-[#EF87BE] from-[#FFCEE6] flex flex-col col-span-2 ms-20 items-center h-55 shadow-lg border-5 border-[#F0B6CF] overflow-visible">
         <Image src={character.pet.pet_model} alt={character.pet.pet_type} width={200} height={200} className="-translate-y-3.5" />
-        <button
-          className="absolute -bottom-6 left-1/2 -translate-x-1/2 rounded-2xl border-4 border-[#D7B87F] bg-[#FBF5D1] px-6 py-3 font-delius text-lg font-bold text-[#2E2805] shadow-md transition-transform hover:scale-[1.02] whitespace-nowrap"
-        >
-          Reset Shop - 1000 EXP
-        </button>
+        <ResetShopButton userexp={userexp} />
     </div>
   );
 }
@@ -415,7 +414,7 @@ return (
           )}
            {rowIndex === 0 && (
             <>
-            <CharacterPanel getCharacter={character}/>
+            <CharacterPanel getCharacter={character} userexp={userexp}/>
             </>)}
 
           {rowIndex < rows.length - 1 && (
