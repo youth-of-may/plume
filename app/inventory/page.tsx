@@ -1,44 +1,8 @@
 import { createClient } from "@/utils/supabase/server";
-import Image from "next/image";
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import Image from "next/image";
 import BodyBackground from "./body_background";
-import ModalWithTrigger from "./inventory_modal";
-
-export async function getUserAccessories() {
-  const cookieStore = cookies();
-  const supabase = await createClient(cookieStore);
-
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user) {
-    console.log("No user logged in");
-    return [];
-  }
-
-  const { data: ownedAccessories, error: ownedError } = await supabase
-    .from("accessory_owned")
-    .select("accessory_id")
-    .eq("user_id", user.id);
-
-  if (ownedError || !ownedAccessories) {
-    console.error(ownedError?.message);
-    return [];
-  }
-
-  const accessoryIds = ownedAccessories.map(a => a.accessory_id);
-
-  const { data: accessories, error: accessoryError } = await supabase
-    .from("accessory")
-    .select("*")
-    .in("accessory_id", accessoryIds);
-
-  if (accessoryError || !accessories) {
-    console.error(accessoryError?.message);
-    return [];
-  }
-
-  return accessories;
-}
 
 export default async function Inventory() {
   const accessories = await getUserAccessories();
