@@ -152,7 +152,7 @@ export default function ModalWithTrigger({ acc,  isOwned, }: { acc: Accessory; i
                     className="px-4 py-2 rounded-xl text-sm font-black flex items-center gap-1"
                     style={{ backgroundColor: "#ADD3EA", border: "2px solid #4a80e0", color: "#1a3e8c" }}
                   >
-                    ⭐ {acc.accessory_exp}
+                    {isOwned ? "Owned" : `⭐ ${acc.accessory_exp}`}
                   </div>
                 </div>
               </div>
