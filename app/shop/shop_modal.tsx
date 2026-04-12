@@ -1,5 +1,6 @@
-"use client";
-
+"use client"
+import { createClient } from "@/utils/supabase/client"
+import { useRouter } from "next/navigation"
 import { useState } from "react";
 import Image from "next/image";
 
@@ -19,10 +20,51 @@ const rarity: Record<string, { bg: string; text: string; border: string }> = {
   Epic:     { bg: "bg-yellow-200", text: "text-yellow-800", border: "border-2 border-yellow-400" },
 };
 
+export default function ModalWithTrigger({ acc,  isOwned, }: { acc: Accessory; isOwned: boolean;}) {
 
-
-export default function ModalWithTrigger({ acc }: { acc: Accessory }) {
   const [isOpen, setIsOpen] = useState(false);
+  const supabase = createClient()
+  const router = useRouter()
+
+  async function purchaseItem(accessory: Accessory) {
+    const { data: { user }, error: userError } = await supabase.auth.getUser()
+    if (userError || !user) return
+
+    const { data: profileRows } = await supabase
+      .from("profile")
+      .select("exp_amount")
+      .eq("user_id", user.id)
+
+    const currentExp = Number(profileRows?.[0]?.exp_amount ?? 0)
+
+    // bro can afford it
+    if (currentExp >= accessory.accessory_exp){
+      // add to owned accessories
+      const accessoryUpdate = await supabase.from("accessory_owned").insert({
+        accessory_id: accessory.accessory_id,
+        user_id: user.id,
+      })
+
+      if (accessoryUpdate.error) {
+        return
+      }
+
+      // deduct exp
+      const newExp = currentExp - accessory.accessory_exp
+      const profileUpdate = await supabase
+        .from("profile")
+        .update({ exp_amount: newExp })
+        .eq("user_id", user.id)
+
+      if (profileUpdate.error) {
+        return
+      }
+      
+      setIsOpen(false)
+      router.refresh()
+    }
+  }
+
 
   return (
     <>
@@ -57,17 +99,6 @@ export default function ModalWithTrigger({ acc }: { acc: Accessory }) {
             <span className="absolute top-4 right-4 w-3 h-3 rounded-full bg-[#c08350] opacity-60" />
             <span className="absolute bottom-4 left-4 w-3 h-3 rounded-full bg-[#c08350] opacity-60" />
             <span className="absolute bottom-4 right-4 w-3 h-3 rounded-full bg-[#c08350] opacity-60" />
-
-            {/* Close button */}
-            <button
-              onClick={() => setIsOpen(false)}
-              className="absolute top-2 right-2 w-12 h-12 rounded-full flex items-center justify-center font-black text-sm transition-colors block md:hidden"
-              style={{ backgroundColor: "#c08350", color: "#FBF5D1" }}
-              onMouseOver={e => (e.currentTarget.style.backgroundColor = "#8b5c30")}
-              onMouseOut={e => (e.currentTarget.style.backgroundColor = "#c08350")}
-            >
-              ✕
-            </button> 
 
             {/* Header */}
             <div className="text-center mb-6">
@@ -121,14 +152,28 @@ export default function ModalWithTrigger({ acc }: { acc: Accessory }) {
                     className="px-4 py-2 rounded-xl text-sm font-black flex items-center gap-1"
                     style={{ backgroundColor: "#ADD3EA", border: "2px solid #4a80e0", color: "#1a3e8c" }}
                   >
-                    ⭐ {acc.accessory_exp}
+                    {isOwned ? "Owned" : `⭐ ${acc.accessory_exp}`}
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Footer button */}
-            <div className="mt-8 flex justify-center">
+            <div className="mt-8 flex justify-center gap-4">
+              
+              {!isOwned && (<button
+                  onClick={() => {purchaseItem(acc)}}
+                  className="px-8 py-3 rounded-xl font-black text-sm uppercase tracking-widest transition-colors block"
+                  style={{ backgroundColor: "#c08350", color: "#FBF5D1", border: "3px solid #8b5c30" }}
+                  onMouseOver={e => (e.currentTarget.style.backgroundColor = "#8b5c30")}
+                  onMouseOut={e => (e.currentTarget.style.backgroundColor = "#c08350")}
+                >
+                  Buy
+                </button>
+                )
+              }
+            
+
               <button
                 onClick={() => setIsOpen(false)}
                 className="px-8 py-3 rounded-xl font-black text-sm uppercase tracking-widest transition-colors hidden md:block"
