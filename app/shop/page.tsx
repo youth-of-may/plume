@@ -372,7 +372,7 @@ return (
                     ${rarity[acc.accessory_rarity]?.bg} 
                       ${rarity[acc.accessory_rarity]?.text}`}
                 >
-                  <h1 className="font-black text-center h-15 text-xl">
+                  <h1 className="font-black text-center h-14 text-xs sm:text-sm md:text-base leading-tight break-words overflow-hidden px-1">
                     {acc.accessory_name}
                   </h1>
 
