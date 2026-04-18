@@ -17,7 +17,6 @@ import {
 // ✅ Plotly fix (no SSR crash)
 const Plot = dynamic(() => import("react-plotly.js"), { ssr: false });
 
-// ─── TYPES ────────────────────────────────────────────────────────────────
 type KPI = {
   tasksCompleted: number;
   totalTasks: number;
@@ -40,7 +39,6 @@ export default function UserDashboard() {
   const [eventCats, setEventCats] = useState<any[]>([]);
   const [streak, setStreak] = useState<any>(null);
 
-  // ─── LOAD DATA ──────────────────────────────────────────────────────────
   useEffect(() => {
     async function loadData() {
       const supabase = createClient();
@@ -89,7 +87,6 @@ export default function UserDashboard() {
     loadData();
   }, []);
 
-  // ─── STATES ─────────────────────────────────────────────────────────────
   if (!userId && !loading) {
     return <div style={{ padding: 40 }}>Not signed in</div>;
   }
@@ -98,7 +95,6 @@ export default function UserDashboard() {
     return <div style={{ padding: 40 }}>Loading...</div>;
   }
 
-  // ─── UI ─────────────────────────────────────────────────────────────────
   return (
     <div style={{ padding: 40 }}>
       <h1>{username ? `${username}'s Dashboard` : "Dashboard"}</h1>

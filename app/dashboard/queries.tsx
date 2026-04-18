@@ -2,8 +2,6 @@
 
 import { createClient } from "@/utils/supabase/server";
 
-// ─── KPIs ─────────────────────────────────────────────────────────────────
-
 export async function getUserKPIs(userId: string) {
   const supabase = await createClient();
 
@@ -27,14 +25,13 @@ export async function getUserKPIs(userId: string) {
   };
 }
 
-// ─── Tasks over time ──────────────────────────────────────────────────────
 
 export async function getUserTasksOverTime(userId: string) {
   const supabase = await createClient();
 
   const { data } = await supabase
     .from("task")
-    .select("created_at, completion_dateti, is_complete")
+    .select("created_at, completion_datetime, is_complete")
     .eq("user_id", userId)
     .gte("created_at", new Date(Date.now() - 30 * 86400000).toISOString())
     .order("created_at", { ascending: true });
@@ -48,8 +45,8 @@ export async function getUserTasksOverTime(userId: string) {
       byDate[created].created++;
     }
 
-    if (row.is_complete && row.completion_dateti) {
-      const completed = row.completion_dateti.slice(0, 10);
+    if (row.is_complete && row.completion_datetime) {
+      const completed = row.completion_datetime.slice(0, 10);
       if (!byDate[completed]) byDate[completed] = { completed: 0, created: 0 };
       byDate[completed].completed++;
     }
@@ -60,7 +57,6 @@ export async function getUserTasksOverTime(userId: string) {
     .map(([date, v]) => ({ date, ...v }));
 }
 
-// ─── Difficulty breakdown ─────────────────────────────────────────────────
 
 export async function getUserDifficultyBreakdown(userId: string) {
   const supabase = await createClient();
@@ -82,7 +78,6 @@ export async function getUserDifficultyBreakdown(userId: string) {
   return Object.entries(map).map(([label, v]) => ({ label, ...v }));
 }
 
-// ─── Mood distribution ────────────────────────────────────────────────────
 
 export async function getUserMoodDistribution(userId: string) {
   const supabase = await createClient();
@@ -103,8 +98,6 @@ export async function getUserMoodDistribution(userId: string) {
     .sort(([, a], [, b]) => b - a)
     .map(([label, value]) => ({ label, value }));
 }
-
-// ─── Journal frequency ────────────────────────────────────────────────────
 
 export async function getUserJournalFrequency(userId: string) {
   const supabase = await createClient();
@@ -131,8 +124,6 @@ export async function getUserJournalFrequency(userId: string) {
     .map(([week, count]) => ({ week, count }));
 }
 
-// ─── Event categories ─────────────────────────────────────────────────────
-
 export async function getUserEventCategories(userId: string) {
   const supabase = await createClient();
 
@@ -152,8 +143,6 @@ export async function getUserEventCategories(userId: string) {
     .sort(([, a], [, b]) => b - a)
     .map(([label, value]) => ({ label, value }));
 }
-
-// ─── Streak ───────────────────────────────────────────────────────────────
 
 export async function getUserStreak(userId: string) {
   const supabase = await createClient();
