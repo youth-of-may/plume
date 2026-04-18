@@ -54,7 +54,7 @@ export default function PetCustomizerClient({
   const slotMap = useMemo(() => {
     const map: Record<SlotName, { x: number; y: number }> = {
       head: { x: 5, y: 0 },
-      chest: { x: 20, y: 180 },
+      chest: { x: 4, y: 10 },
     };
 
     for (const slot of slots ?? []) {

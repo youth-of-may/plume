@@ -16,6 +16,18 @@ type CharacterData = {
   petName: string;
   expAmount: number;
   pet: PetData;
+  slots: { slot_name: string; x: number; y: number }[];
+  equippedAccessories: {
+    equipped_id: string;
+    slot: string;                
+    accessory_owned: {
+      accessory_id: string;
+      accessory: {
+        accessory_url: string;
+        accessory_name: string;
+      } | null;
+    } | null;
+  }[];
 };
 
 type CharacterResult =
@@ -61,6 +73,17 @@ async function getCharacterSummary(): Promise<CharacterResult> {
     .select("pet_model, pet_type")
     .eq("pet_id", userPet.pet_id)
     .maybeSingle();
+  
+  const { data: slots } = await supabase
+  .from("slot")
+  .select("slot_name, x, y")
+  .eq("pet_id", userPet.pet_id);
+
+  const { data: equippedAccessories } = await supabase
+  .from("pet_accessory_equipped")
+  .select("equipped_id, slot, accessory_owned(accessory_id, accessory(accessory_url, accessory_name))")
+  .eq("virtual_petid", profile.virtual_petid)
+  .returns<CharacterData["equippedAccessories"]>();
 
 
   return {
@@ -70,6 +93,8 @@ async function getCharacterSummary(): Promise<CharacterResult> {
       expAmount: profile.exp_amount ?? 0,
       petName: userPet.pet_name || "My Pet",
       pet,
+      equippedAccessories: equippedAccessories ?? [],
+      slots: slots ?? [],
     },
   };
 }
@@ -116,6 +141,23 @@ async function CharacterPanel({
   return (
     <div className="flex flex-col items-end -translate-y-147 -translate-x-20 -z-1">
         <Image src={character.pet.pet_model} alt={character.pet.pet_type} width={150} height={150}/>
+        {character.equippedAccessories.map((acc) => {
+                            const item = acc.accessory_owned?.accessory;
+                            if (!item) return null;
+              
+                            const pos = character.slots.find((s) => s.slot_name === acc.slot);
+              
+                            return (
+                             <Image
+                              key={acc.equipped_id}
+                              src={item.accessory_url}
+                              alt={item.accessory_name}
+                              width={150}
+                              height={150}
+                              className="absolute object-contain"
+                            />
+                          );
+                        })}
     </div>
   );
 }

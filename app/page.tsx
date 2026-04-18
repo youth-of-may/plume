@@ -21,6 +21,18 @@ type CharacterData = {
   expAmount: number;
   pet: PetData;
   mood: MoodData;
+  slots: { slot_name: string; x: number; y: number }[];
+  equippedAccessories: {
+    equipped_id: string;
+    slot: string;                
+    accessory_owned: {
+      accessory_id: string;
+      accessory: {
+        accessory_url: string;
+        accessory_name: string;
+      } | null;
+    } | null;
+  }[];
 };
 
 type CharacterResult =
@@ -97,8 +109,19 @@ async function getCharacterSummary(): Promise<CharacterResult> {
     .eq("pet_id", userPet.pet_id)
     .maybeSingle();
 
+  const { data: slots } = await supabase
+  .from("slot")
+  .select("slot_name, x, y")
+  .eq("pet_id", userPet.pet_id);
+
   const moodName = Number.isFinite(moodId) ? await getMoodName(supabase, moodId) : null;
   const mood: MoodData = moodName ? { mood_name: moodName } : null;
+
+  const { data: equippedAccessories } = await supabase
+  .from("pet_accessory_equipped")
+  .select("equipped_id, slot, accessory_owned(accessory_id, accessory(accessory_url, accessory_name))")
+  .eq("virtual_petid", profile.virtual_petid)
+  .returns<CharacterData["equippedAccessories"]>();
 
   return {
     kind: "ready",
@@ -109,6 +132,8 @@ async function getCharacterSummary(): Promise<CharacterResult> {
       moodId,
       pet,
       mood,
+      equippedAccessories: equippedAccessories ?? [],
+      slots: slots ?? [],
     },
   };
 }
@@ -178,10 +203,31 @@ async function CharacterPanel({
 
   return (
     <div className="rounded-2xl border-4 border-[#E4DCAB] p-6 bg-[#fef5ffbb] flex flex-col md:flex-row gap-6 items-center justify-between">
-      <div className="grid justify-items-center">
-        <Image src={character.pet.pet_model} alt={character.pet.pet_type} width={180} height={180} />
-        <p className="font-delius text-xl text-[#2E2805]">{character.petName}</p>
-      </div>
+      <div className="relative w-[180px] h-[180px]">
+           <Image
+            src={character.pet.pet_model}
+            alt={character.pet.pet_type}
+            fill
+            className="object-contain"
+           />
+           {character.equippedAccessories.map((acc) => {
+              const item = acc.accessory_owned?.accessory;
+              if (!item) return null;
+
+              const pos = character.slots.find((s) => s.slot_name === acc.slot);
+
+              return (
+               <Image
+                key={acc.equipped_id}
+                src={item.accessory_url}
+                alt={item.accessory_name}
+                width={305}
+                height={200}
+                className="absolute object-contain"
+              />
+            );
+          })}
+       </div>
       <div className="font-delius text-[#2E2805] space-y-3">
         <p className="text-3xl">Hi, {character.userName}!</p>
         <p className="text-xl">EXP Points: {character.expAmount}</p>
