@@ -92,8 +92,11 @@ export default function NewJournalPage() {
 
   return (
     <>
+    <div className="flex flex-col">
       <JournalForm createJournal={createJournal} />
       <CharacterPanel />
+    </div>
+      
     </>
   );
 }

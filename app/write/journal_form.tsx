@@ -24,11 +24,11 @@ export default function JournalForm({ createJournal }: JournalFormProps) {
   };
 
   return (
-    <form action={handleSubmit} className="w-full flex flex-col gap-24 items-center mb-12">
+    <form action={handleSubmit} className="w-full flex flex-col gap-24 items-center mb-12 h-300">
 
       {/* Header */}
       <header className="w-full bg-[#FBF5D1] p-12">
-        <h1 className="text-center text-[#163F55] text-6xl font-cherry">
+        <h1 className="text-center text-[#2E2805] text-6xl font-cherry">
           How are you feeling today?
         </h1>
         <MoodSelector />
@@ -44,7 +44,7 @@ export default function JournalForm({ createJournal }: JournalFormProps) {
         <textarea
           name="entry_text"
           placeholder="Write your thoughts..."
-          className="font-delius min-h-200 resize-y p-4 w-full border rounded-3xl"
+          className="font-delius h-100 resize-y p-4 w-full border rounded-3xl overflow-auto"
           required
         />
 

@@ -106,12 +106,12 @@ export default async function CharacterPanel() {
   }
 
   return (
-    <div className="flex flex-col -translate-y-299 w-full items-end px-50">
+    <div className="flex flex-col w-full -translate-y-259 items-end px-50">
       <Image
         src={character.pet.pet_model}
         alt={character.pet.pet_type}
-        width={150}
-        height={150}
+        width={152}
+        height={152}
       />
       {character.equippedAccessories.map((acc) => {
          const item = acc.accessory_owned?.accessory;
