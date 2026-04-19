@@ -106,7 +106,7 @@ export default async function CharacterPanel() {
   }
 
   return (
-    <div className="flex flex-col -translate-y-311 w-full items-end px-50">
+    <div className="flex flex-col -translate-y-299 w-full items-end px-50">
       <Image
         src={character.pet.pet_model}
         alt={character.pet.pet_type}

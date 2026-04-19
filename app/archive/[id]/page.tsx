@@ -151,7 +151,7 @@ async function CharacterPanel({
   }
 
   return (
-    <div className="flex flex-col items-end -translate-y-44">
+    <div className="flex flex-col items-end -translate-y-39">
         <Image src={character.pet.pet_model} alt={character.pet.pet_type} width={150} height={150}/>
         {character.equippedAccessories.map((acc) => {
            const item = acc.accessory_owned?.accessory;

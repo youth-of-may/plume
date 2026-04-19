@@ -156,7 +156,7 @@ export default function ResetShopButton({ userexp }: { userexp: number }) {
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="absolute -bottom-6 left-1/2 -translate-x-1/2 rounded-2xl border-4 border-[#D7B87F] bg-[#FBF5D1] px-6 py-3 font-delius text-lg font-bold text-[#2E2805] shadow-md transition-transform hover:scale-[1.02] whitespace-nowrap"
+        className="absolute -bottom-10 left-1/2 -translate-x-1/2 rounded-2xl border-4 border-[#D7B87F] bg-[#FBF5D1] px-6 py-3 font-delius text-lg font-bold text-[#2E2805] shadow-md transition-transform hover:scale-[1.02] whitespace-nowrap"
       >
         Reset Shop - 1000 EXP
       </button>
