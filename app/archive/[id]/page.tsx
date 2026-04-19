@@ -209,8 +209,14 @@ export default async function Entry({ params }: { params: Promise<{ id: string }
           />
         </div>
         )}
-      
+      <div className="flex justify-center items-center gap-10">
+        <Link href="/archive" className="bg-[#ADD3EA] hover:bg-blue-200 py-1 px-3 rounded-2xl text-sm border-3 border-[#5e94b67d] z-50 inline-block">
+          Back
+        </Link>
+
         <DeleteButton id={id}/>
+      </div>
+        
       </div>
       <CharacterPanel getCharacter={character}/>
     </div>
