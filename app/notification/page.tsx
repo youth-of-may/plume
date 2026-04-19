@@ -69,7 +69,7 @@ function NotificationCard({
         <div
             className={`rounded-2xl p-6 transition-all duration-300 font-delius border-2 ${enabled
                 ? "bg-[#FDFFF7] shadow-lg border-transparent"
-                : "bg-white/40 border-[#CCC38D]/30 shadow-sm opacity-60"
+                : "bg-white border-[#CCC38D]/30 shadow-sm opacity-40"
                 }`}
         >
             <div className="flex items-start justify-between mb-4">
@@ -203,7 +203,7 @@ export default function NotificationSettingsPage() {
                 <div className="rounded-3xl shadow-xl shadow-black/20 overflow-hidden font-delius bg-[#CCC38D]">
                     {/* Top bar */}
                     <div className="flex items-center justify-between px-6 py-5">
-                        <Link href="/">
+                        <Link href="/" className="hover:font-bold">
                             Back
                         </Link>
                         <p className="text-xs font-extrabold tracking-widest uppercase text-[#2e2805a8]">
@@ -213,7 +213,7 @@ export default function NotificationSettingsPage() {
                     </div>
 
                     {/* Content */}
-                    <div className="bg-[#FBF5D1] rounded-t-2xl px-6 py-6 space-y-4">
+                    <div className="bg-[#FBF5D1] rounded-b-2xl px-6 py-6 space-y-4">
 
 
 
@@ -260,7 +260,7 @@ export default function NotificationSettingsPage() {
                                 disabled={saving}
                                 className={`w-full font-black tracking-widest uppercase py-3 rounded-full text-sm transition-all duration-300 shadow-md ${saved
                                     ? "bg-[#CCC38D] text-[#2E2805] shadow-none"
-                                    : "bg-[#F0B6CF] hover:bg-pink-300 text-[#2E2805] border-2 border-[#d790af]"
+                                    : "bg-[#ADD3EA] hover:bg-blue-200 text-[#2E2805] border-2 border-[#76a4c0]"
                                     }`}
                             >
                                 {saving ? "saving..." : saved ? "✓ saved!" : "save changes"}
