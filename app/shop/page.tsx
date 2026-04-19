@@ -17,6 +17,18 @@ type CharacterData = {
   petName: string;
   expAmount: number;
   pet: PetData;
+  slots: { slot_name: string; x: number; y: number }[];
+  equippedAccessories: {
+    equipped_id: string;
+    slot: string;                
+    accessory_owned: {
+      accessory_id: string;
+      accessory: {
+        accessory_url: string;
+        accessory_name: string;
+      } | null;
+    } | null;
+  }[];
 };
 
 type CharacterResult =
@@ -255,11 +267,31 @@ async function getCharacterSummary(): Promise<CharacterResult> {
     return { kind: "notFound" };
   }
 
+  const moodId = Number(userPet.mood_id);
+
   const { data: pet } = await supabase
-    .from("pet")
-    .select("pet_model, pet_type")
-    .eq("pet_id", userPet.pet_id)
-    .maybeSingle();
+  .from("pet")
+  .select("pet_model, pet_type")
+  .eq("pet_id", userPet.pet_id)
+  .maybeSingle();
+
+  const { data: petMood } = await supabase
+  .from("pet_mood")
+  .select("image_url")
+  .eq("pet_id", userPet.pet_id)
+  .eq("mood_id", moodId)
+  .maybeSingle();
+  
+  const { data: slots } = await supabase
+  .from("slot")
+  .select("slot_name, x, y")
+  .eq("pet_id", userPet.pet_id);
+
+  const { data: equippedAccessories } = await supabase
+  .from("pet_accessory_equipped")
+  .select("equipped_id, slot, accessory_owned(accessory_id, accessory(accessory_url, accessory_name))")
+  .eq("virtual_petid", profile.virtual_petid)
+  .returns<CharacterData["equippedAccessories"]>();
 
 
   return {
@@ -268,7 +300,12 @@ async function getCharacterSummary(): Promise<CharacterResult> {
       userName: profile.username,
       expAmount: profile.exp_amount ?? 0,
       petName: userPet.pet_name || "My Pet",
-      pet,
+      pet: pet ? { 
+         pet_type: pet.pet_type, 
+         pet_model: petMood?.image_url ?? pet.pet_model  // fallback to base model
+      } : null,
+      equippedAccessories: equippedAccessories ?? [],
+      slots: slots ?? [],
     },
   };
 }
@@ -317,6 +354,27 @@ async function CharacterPanel({
   return (
     <div className="relative p-6 bg-linear-to-b to-[#EF87BE] from-[#FFCEE6] flex flex-col col-span-2 ms-20 items-center h-55 shadow-lg border-5 border-[#F0B6CF] overflow-visible">
         <Image src={character.pet.pet_model} alt={character.pet.pet_type} width={200} height={200} className="-translate-y-3.5" />
+        {character.equippedAccessories.map((acc) => {
+                            const item = acc.accessory_owned?.accessory;
+                            if (!item) return null;
+              
+                            const pos = character.slots.find((s) => s.slot_name === acc.slot);
+              
+                            return (
+                             <Image
+                              key={acc.equipped_id}
+                              src={item.accessory_url}
+                              alt={item.accessory_name}
+                              width={200}
+                              height={200}
+                              className="absolute object-contain"
+                              style={{
+                                 center: pos?.x ?? 0,
+                                 bottom: pos?.y ?? 0,
+                              }}
+                            />
+                          );
+                        })}
         <ResetShopButton userexp={userexp} />
     </div>
   );

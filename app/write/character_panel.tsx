@@ -3,7 +3,24 @@ import Link from "next/link";
 import { createClient } from "@/utils/supabase/server";
 
 type PetData = { pet_model: string; pet_type: string } | null;
-type CharacterData = { userName: string; petName: string; expAmount: number; pet: PetData };
+type CharacterData = { 
+  userName: string; 
+  petName: string; 
+  expAmount: number; 
+  pet: PetData;
+  slots: { slot_name: string; x: number; y: number }[];
+  equippedAccessories: {
+    equipped_id: string;
+    slot: string;                
+    accessory_owned: {
+      accessory_id: string;
+      accessory: {
+        accessory_url: string;
+        accessory_name: string;
+      } | null;
+    } | null;
+  }[];
+};
 type CharacterResult =
   | { kind: "notFound" }
   | { kind: "notSelected" }
@@ -25,17 +42,37 @@ async function getCharacterSummary(): Promise<CharacterResult> {
 
   const { data: userPet } = await supabase
     .from("user_pet")
-    .select("pet_name, pet_id")
+    .select("pet_name, mood_id, pet_id")  // with mood_id
     .eq("virtual_petid", profile.virtual_petid)
     .maybeSingle();
 
   if (!userPet) return { kind: "notFound" };
 
+  const moodId = Number(userPet.mood_id);
+
   const { data: pet } = await supabase
-    .from("pet")
-    .select("pet_model, pet_type")
-    .eq("pet_id", userPet.pet_id)
-    .maybeSingle();
+  .from("pet")
+  .select("pet_model, pet_type")
+  .eq("pet_id", userPet.pet_id)
+  .maybeSingle();
+
+  const { data: petMood } = await supabase
+  .from("pet_mood")
+  .select("image_url")
+  .eq("pet_id", userPet.pet_id)
+  .eq("mood_id", moodId)
+  .maybeSingle();
+  
+  const { data: slots } = await supabase
+  .from("slot")
+  .select("slot_name, x, y")
+  .eq("pet_id", userPet.pet_id);
+
+  const { data: equippedAccessories } = await supabase
+  .from("pet_accessory_equipped")
+  .select("equipped_id, slot, accessory_owned(accessory_id, accessory(accessory_url, accessory_name))")
+  .eq("virtual_petid", profile.virtual_petid)
+  .returns<CharacterData["equippedAccessories"]>();
 
   return {
     kind: "ready",
@@ -43,7 +80,12 @@ async function getCharacterSummary(): Promise<CharacterResult> {
       userName: profile.username,
       expAmount: profile.exp_amount ?? 0,
       petName: userPet.pet_name || "My Pet",
-      pet,
+      pet: pet ? { 
+         pet_type: pet.pet_type, 
+         pet_model: petMood?.image_url ?? pet.pet_model  // fallback to base model
+      } : null,
+      equippedAccessories: equippedAccessories ?? [],
+      slots: slots ?? [],
     },
   };
 }
@@ -71,6 +113,23 @@ export default async function CharacterPanel() {
         width={150}
         height={150}
       />
+      {character.equippedAccessories.map((acc) => {
+         const item = acc.accessory_owned?.accessory;
+         if (!item) return null;
+      
+         const pos = character.slots.find((s) => s.slot_name === acc.slot);
+      
+         return (
+         <Image
+          key={acc.equipped_id}
+          src={item.accessory_url}
+          alt={item.accessory_name}
+          width={150}
+          height={150}
+          className="absolute object-contain"
+           />
+        );
+      })}
     </div>
   );
 }
