@@ -194,16 +194,16 @@ export default async function PetCustomizePage() {
     return (
       <div className="min-h-screen bg-[#e2a9c1] p-8">
         <header className="mb-8 w-full bg-[#FBF5D1] px-[50px] py-[20px]">
-          <h2 className="text-right text-5xl font-cherry text-[#163F55]">
+          <h2 className="text-right text-5xl font-cherry text-[#2E2805}">
             Pet Customization
           </h2>
         </header>
 
         <div className="mx-auto max-w-4xl rounded-3xl border-4 border-[#FBF5D1] bg-[#eecc8e] p-8 inset-ring-4 inset-ring-[#FBF5D1]">
-          <h1 className="text-4xl font-cherry text-[#163F55]">
+          <h1 className="text-4xl font-cherry text-[#2E2805}">
             No active pet selected
           </h1>
-          <p className="mt-4 text-lg text-[#163F55]">
+          <p className="mt-4 text-lg text-[#2E2805}">
             Pick a pet first, then come back to customize it.
           </p>
         </div>
@@ -217,13 +217,13 @@ export default async function PetCustomizePage() {
     return (
       <div className="min-h-screen bg-[#e2a9c1] p-8">
         <header className="mb-8 w-full bg-[#FBF5D1] px-[50px] py-[20px]">
-          <h2 className="text-right text-5xl font-cherry text-[#163F55]">
+          <h2 className="text-right text-5xl font-cherry text-[#2E2805}">
             Pet Customization
           </h2>
         </header>
 
         <div className="mx-auto max-w-4xl rounded-3xl border-4 border-[#FBF5D1] bg-[#eecc8e] p-8 inset-ring-4 inset-ring-[#FBF5D1]">
-          <h1 className="text-4xl font-cherry text-[#163F55]">
+          <h1 className="text-4xl font-cherry text-[#2E2805}">
             Pet data missing
           </h1>
         </div>
@@ -234,7 +234,7 @@ export default async function PetCustomizePage() {
   return (
     <div className="min-h-screen bg-[#e2a9c1]">
       <header className="mb-8 w-full bg-[#FBF5D1] px-[50px] py-[20px]">
-        <h2 className="text-right text-5xl font-cherry text-[#163F55]">
+        <h2 className="text-right text-5xl font-cherry text-[#2E2805}">
           Pet Customization
         </h2>
       </header>

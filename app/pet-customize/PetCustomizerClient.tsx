@@ -112,8 +112,8 @@ export default function PetCustomizerClient({
   return (
     <div className="grid grid-cols-1 gap-8 lg:grid-cols-[420px_minmax(0,1fr)]">
       <section className="rounded-3xl border-4 border-[#FBF5D1] bg-[#eecc8e] p-6 inset-ring-4 inset-ring-[#FBF5D1]">
-        <h2 className="text-4xl font-cherry text-[#163F55]">{petName}</h2>
-        <p className="mb-6 text-lg text-[#163F55]">{petType}</p>
+        <h2 className="text-4xl font-cherry text-[#2E2805]">{petName}</h2>
+        <p className="mb-6 text-lg text-[#2E2805]">{petType}</p>
 
         <div className="rounded-3xl bg-[#FBF5D1] p-6">
           <div className="relative mx-auto aspect-square w-full max-w-[340px] overflow-hidden rounded-3xl bg-white">
@@ -147,28 +147,28 @@ export default function PetCustomizerClient({
 
           <div className="mt-4 grid gap-3">
             <div className="flex items-center justify-between rounded-2xl bg-white p-3">
-              <p className="text-[#163F55]">
+              <p className="text-[#2E2805]">
                 <strong>Head:</strong>{" "}
                 {equippedBySlot.head?.accessory_name ?? "None"}
               </p>
               <button
                 onClick={() => handleUnequip("head")}
                 disabled={!equippedBySlot.head || isPending}
-                className="rounded-xl bg-[#163F55] px-4 py-2 text-white disabled:opacity-50"
+                className="rounded-4xl bg-[#8FBCD6] px-4 py-2 border-2 text-[#163F55] disabled:opacity-50"
               >
                 Unequip
               </button>
             </div>
 
             <div className="flex items-center justify-between rounded-2xl bg-white p-3">
-              <p className="text-[#163F55]">
+              <p className="text-[#2E2805]">
                 <strong>Chest:</strong>{" "}
                 {equippedBySlot.chest?.accessory_name ?? "None"}
               </p>
               <button
                 onClick={() => handleUnequip("chest")}
                 disabled={!equippedBySlot.chest || isPending}
-                className="rounded-xl bg-[#163F55] px-4 py-2 text-white disabled:opacity-50"
+                className="rounded-4xl bg-[#8FBCD6] px-4 py-2 border-2 text-[#163F55] disabled:opacity-50"
               >
                 Unequip
               </button>
@@ -178,13 +178,13 @@ export default function PetCustomizerClient({
       </section>
 
       <section className="rounded-3xl border-4 border-[#FBF5D1] bg-[#eecc8e] p-6 inset-ring-4 inset-ring-[#FBF5D1]">
-        <h2 className="mb-4 text-3xl font-cherry text-[#163F55]">
+        <h2 className="mb-4 text-3xl font-cherry text-[#2E2805]">
           Your Accessories
         </h2>
 
         <div className="grid gap-6">
           <div>
-            <h3 className="mb-3 text-2xl font-cherry text-[#163F55]">
+            <h3 className="mb-3 text-2xl font-cherry text-[#2E2805]">
               Head Accessories
             </h3>
             <div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-4">
@@ -212,7 +212,7 @@ export default function PetCustomizerClient({
                       height={72}
                       className="mx-auto"
                     />
-                    <p className="mt-2 text-sm text-[#163F55]">
+                    <p className="mt-2 text-sm text-[#2E2805]">
                       {item.accessory_name}
                     </p>
                   </button>
@@ -222,7 +222,7 @@ export default function PetCustomizerClient({
           </div>
 
           <div>
-            <h3 className="mb-3 text-2xl font-cherry text-[#163F55]">
+            <h3 className="mb-3 text-2xl font-cherry text-[#2E2805]">
               Chest Accessories
             </h3>
             <div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-4">
@@ -250,7 +250,7 @@ export default function PetCustomizerClient({
                       height={72}
                       className="mx-auto"
                     />
-                    <p className="mt-2 text-sm text-[#163F55]">
+                    <p className="mt-2 text-sm text-[#2E2805]">
                       {item.accessory_name}
                     </p>
                   </button>
