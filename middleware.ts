@@ -22,6 +22,10 @@ function isPublicRoute(pathname: string) {
   return pathname.startsWith("/_next") || pathname.startsWith("/api/");
 }
 
+function isApiRoute(pathname: string) {
+  return pathname.startsWith("/api/");
+}
+
 function isPetSelectionRoute(pathname: string) {
   return pathname === "/pet-selection" || pathname.startsWith("/pet-selection/");
 }
@@ -44,6 +48,7 @@ async function userNeedsPetSelection(supabase: ReturnType<typeof createServerCli
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   const isPublic = isPublicRoute(pathname);
+  const isApi = isApiRoute(pathname);
   let response = NextResponse.next({ request });
 
   const supabase = createServerClient(
@@ -88,7 +93,7 @@ export async function middleware(request: NextRequest) {
     return redirectResponse;
   }
 
-  if (user && isPublicRoute(pathname) && !shouldGoToPetSelection) {
+  if (user && isPublicRoute(pathname) && !isApi && !shouldGoToPetSelection) {
     const redirectResponse = NextResponse.redirect(new URL("/", request.url));
     response.cookies.getAll().forEach((cookie) => {
       redirectResponse.cookies.set(cookie.name, cookie.value);
