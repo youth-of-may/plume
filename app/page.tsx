@@ -550,14 +550,14 @@ function MoodChart({ moodDays }: { moodDays: MoodDay[] }) {
                 style={{ color: m.color }}
               >
                 {m.id === 1
-                  ? "Very Happy"
+                  ? "Ecstatic"
                   : m.id === 2
-                  ? "Happy"
+                  ? "Gleeful"
                   : m.id === 3
-                  ? "Neutral"
+                  ? "Impassive"
                   : m.id === 4
-                  ? "Sad"
-                  : "Very Sad"}
+                  ? "Despondent"
+                  : "Ire"}
               </span>
             </div>
           ))}
