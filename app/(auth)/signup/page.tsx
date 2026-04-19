@@ -1,6 +1,6 @@
 "use client"
 import { createClient } from '@/utils/supabase/client';
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link';
 
@@ -11,8 +11,22 @@ export default function Signup() {
     const [password, setPassword] = useState('');
     const [name, setName] = useState('');
     const [username, setUsername] = useState('');
+    const [profilePicPreview, setProfilePicPreview] = useState<string | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
     const supabase = createClient();
     const router = useRouter();
+
+    function handlePhotoSelect(e: React.ChangeEvent<HTMLInputElement>) {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        setProfilePicPreview(URL.createObjectURL(file));
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            const base64 = ev.target?.result as string;
+            sessionStorage.setItem('pending_profile_pic', JSON.stringify({ base64, name: file.name, type: file.type }));
+        };
+        reader.readAsDataURL(file);
+    }
 
     async function signUpNewUser() {
         const selectedUsername = username.trim();
@@ -115,11 +129,18 @@ export default function Signup() {
                 e.preventDefault();
                 signUpNewUser();
             }}>
-                <div className="mt-4 gap-x-3 justify-items-center">
-                    <svg viewBox="0 0 24 24" fill="currentColor" data-slot="icon" aria-hidden="true" className="size-30 text-gray-500">
-                    <path d="M18.685 19.097A9.723 9.723 0 0 0 21.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 0 0 3.065 7.097A9.716 9.716 0 0 0 12 21.75a9.716 9.716 0 0 0 6.685-2.653Zm-12.54-1.285A7.486 7.486 0 0 1 12 15a7.486 7.486 0 0 1 5.855 2.812A8.224 8.224 0 0 1 12 20.25a8.224 8.224 0 0 1-5.855-2.438ZM15.75 9a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" clipRule="evenodd" fillRule="evenodd" />
-                    </svg>
-                    <button type="button" className="font-delius rounded-md bg-white/10 px-3 py-2 text-sm font-semibold text-[#2E2805] inset-ring inset-ring-white/5 hover:bg-[#F0B6CF]/50">upload photo</button>
+                <div className="mt-4 gap-y-2 flex flex-col justify-center items-center">
+                    {profilePicPreview ? (
+                        <img src={profilePicPreview} alt="Profile preview" className="rounded-full w-25 h-25 object-cover" />
+                    ) : (
+                        <svg viewBox="0 0 24 24" fill="currentColor" data-slot="icon" aria-hidden="true" className="size-25 text-gray-400">
+                            <path d="M18.685 19.097A9.723 9.723 0 0 0 21.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 0 0 3.065 7.097A9.716 9.716 0 0 0 12 21.75a9.716 9.716 0 0 0 6.685-2.653Zm-12.54-1.285A7.486 7.486 0 0 1 12 15a7.486 7.486 0 0 1 5.855 2.812A8.224 8.224 0 0 1 12 20.25a8.224 8.224 0 0 1-5.855-2.438ZM15.75 9a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" clipRule="evenodd" fillRule="evenodd" />
+                        </svg>
+                    )}
+                    <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoSelect} />
+                    <button type="button" onClick={() => fileInputRef.current?.click()} className="font-delius rounded-md bg-white/10 px-3 py-2 text-sm font-semibold text-[#2E2805] inset-ring inset-ring-white/5 hover:bg-[#F0B6CF]/50">
+                        {profilePicPreview ? 'change photo' : 'upload photo'}
+                    </button>
                 </div>
 
                 {/* name text area */}
