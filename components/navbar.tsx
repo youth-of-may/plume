@@ -113,9 +113,17 @@ function FullNav() {
       setIsReady(true);
     });
 
+    const onExpUpdated = (e: Event) => {
+      const detail = (e as CustomEvent<{ exp: number }>).detail;
+      if (mounted) setEXP(detail.exp);
+    };
+
+    window.addEventListener("exp-updated", onExpUpdated);
+
     return () => {
       mounted = false;
       authListener.subscription.unsubscribe();
+      window.removeEventListener("exp-updated", onExpUpdated);
     };
   }, [supabase]);
 
