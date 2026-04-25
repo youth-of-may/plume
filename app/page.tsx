@@ -106,7 +106,7 @@ function computeStreak(entries: { entry_creation: string }[] | null): number {
   const todayStr = toPHDateStr(new Date().toISOString());
 
   // Use a plain date string to avoid timezone arithmetic issues
-  let current = new Date(todayStr + "T00:00:00");
+  const current = new Date(todayStr + "T00:00:00");
 
   if (!dates.has(todayStr)) {
     current.setDate(current.getDate() - 1);
@@ -309,6 +309,16 @@ export default async function Page() {
             Your Character
           </h2>
           <CharacterPanel characterResult={characterResult} />
+          {characterResult.kind === "ready" && (
+            <div className="mt-4 flex justify-end">
+              <Link
+                href="/pet-chat"
+                className="rounded-2xl bg-[#C17F9E] px-5 py-3 font-delius text-white hover:bg-[#A0607E]"
+              >
+                Talk to Your Pet
+              </Link>
+            </div>
+          )}
         </section>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -540,14 +550,14 @@ function MoodChart({ moodDays }: { moodDays: MoodDay[] }) {
                 style={{ color: m.color }}
               >
                 {m.id === 1
-                  ? "Very Happy"
+                  ? "Ecstatic"
                   : m.id === 2
-                  ? "Happy"
+                  ? "Gleeful"
                   : m.id === 3
-                  ? "Neutral"
+                  ? "Impassive"
                   : m.id === 4
-                  ? "Sad"
-                  : "Very Sad"}
+                  ? "Despondent"
+                  : "Ire"}
               </span>
             </div>
           ))}
