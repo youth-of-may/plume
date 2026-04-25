@@ -150,6 +150,7 @@ export default function ResetShopButton({ userexp }: { userexp: number }) {
       return
     }
     
+    window.dispatchEvent(new CustomEvent("exp-updated", { detail: { exp: newExp } }))
     setIsOpen(false)
     router.refresh()
     setIsResetting(false)
