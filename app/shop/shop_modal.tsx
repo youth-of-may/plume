@@ -31,11 +31,14 @@ export default function ModalWithTrigger({
 }) {
 
   const [isOpen, setIsOpen] = useState(false);
+  const [isPurchasing, setIsPurchasing] = useState(false);
   const supabase = createClient()
   const router = useRouter()
   const canAfford = (userexp ?? 0) >= acc.accessory_exp
 
   async function purchaseItem(accessory: Accessory) {
+    if (isPurchasing) return
+    setIsPurchasing(true)
     const { data: { user }, error: userError } = await supabase.auth.getUser()
     if (userError || !user) return
 
@@ -72,6 +75,7 @@ export default function ModalWithTrigger({
       setIsOpen(false)
       router.refresh()
     }
+    setIsPurchasing(false)
   }
 
 
@@ -173,27 +177,27 @@ export default function ModalWithTrigger({
               {!isOwned && (
                 <button
                   onClick={() => {
-                    if (canAfford) {
+                    if (canAfford && !isPurchasing) {
                       purchaseItem(acc)
                     }
                   }}
-                  disabled={!canAfford}
+                  disabled={!canAfford || isPurchasing}
                   className="px-8 py-3 rounded-xl font-black text-sm uppercase tracking-widest transition-colors block disabled:cursor-not-allowed"
                   style={{
-                    backgroundColor: canAfford ? "#c08350" : "#b8b1a0",
+                    backgroundColor: canAfford && !isPurchasing ? "#c08350" : "#b8b1a0",
                     color: "#FBF5D1",
-                    border: `3px solid ${canAfford ? "#8b5c30" : "#8f8878"}`,
+                    border: `3px solid ${canAfford && !isPurchasing ? "#8b5c30" : "#8f8878"}`,
                   }}
                   onMouseOver={e => {
-                    if (canAfford) {
+                    if (canAfford && !isPurchasing) {
                       e.currentTarget.style.backgroundColor = "#8b5c30"
                     }
                   }}
                   onMouseOut={e => {
-                    e.currentTarget.style.backgroundColor = canAfford ? "#c08350" : "#b8b1a0"
+                    e.currentTarget.style.backgroundColor = canAfford && !isPurchasing ? "#c08350" : "#b8b1a0"
                   }}
                 >
-                  {canAfford ? "Buy" : "Insufficient Funds"}
+                  {isPurchasing ? "Buying..." : canAfford ? "Buy" : "Insufficient Funds"}
                 </button>
               )}
             
