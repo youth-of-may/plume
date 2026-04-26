@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
+import { ensureProfileRecord } from "@/utils/supabase/ensure-profile";
 
 type Pet = {
   pet_id: number;
@@ -77,10 +78,7 @@ export default function PetSelectionPage() {
     setSubmitting(true);
     setPopupStatus("Saving your choice...");
 
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser();
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
 
     if (userError || !user) {
       setSubmitting(false);
@@ -88,18 +86,26 @@ export default function PetSelectionPage() {
       return;
     }
 
-    const { data: profileRows, error: profileError } = await supabase
-      .from("profile")
-      .select("user_id")
-      .eq("user_id", user.id)
-      .maybeSingle();
+    // Ensure the profile row exists before touching user_pet.
+    // If it was never created (e.g. confirm page failed), create it now.
+    const { data: { session } } = await supabase.auth.getSession();
+    const profileResult = await ensureProfileRecord(supabase, user, {
+      name: typeof user.user_metadata?.name === "string" ? user.user_metadata.name.trim() : "",
+      username: typeof user.user_metadata?.username === "string" ? user.user_metadata.username.trim() : "",
+      ...(session?.access_token ? { accessToken: session.access_token } : {}),
+    });
 
-    const profileUserId = profileRows?.user_id;
+    if (!profileResult.ok) {
+      setSubmitting(false);
+      setPopupStatus("Could not set up your profile. Please try again.");
+      return;
+    }
 
+    // Insert the pet using user.id directly — profileRows?.user_id is always the same value.
     const { data: createdVirtualPet, error: userPetError } = await supabase
       .from("user_pet")
       .insert({
-        user_id: profileUserId,
+        user_id: user.id,
         pet_id: selectedPet.pet_id,
         mood_id: 1,
         pet_name: trimmedName,
@@ -107,7 +113,8 @@ export default function PetSelectionPage() {
       .select("virtual_petid")
       .single();
 
-    if (profileError || !profileUserId || userPetError || !createdVirtualPet?.virtual_petid) {
+    if (userPetError || !createdVirtualPet?.virtual_petid) {
+      console.error("user_pet insert failed:", userPetError?.message);
       setSubmitting(false);
       setPopupStatus("Could not save your pet selection. Please try again.");
       return;
@@ -119,6 +126,7 @@ export default function PetSelectionPage() {
       .eq("user_id", user.id);
 
     if (virtualPetError) {
+      console.error("profile virtual_petid update failed:", virtualPetError.message);
       setSubmitting(false);
       setPopupStatus("Could not link your pet to this account. Please try again.");
       return;

@@ -39,7 +39,7 @@ async function userNeedsPetSelection(supabase: ReturnType<typeof createServerCli
 
   if (error) {
     console.error("Profile lookup failed in middleware:", error.message);
-    return false;
+    return true;
   }
 
   return !profile || profile.virtual_petid == null;
