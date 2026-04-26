@@ -3,12 +3,11 @@ import { createAdminClient } from '@/utils/supabase/admin';
 import { render } from '@react-email/render';
 import SignupConfirmationEmail from '@/emails/SignupConfirmationEmail';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 const usernamePattern = /^[A-Za-z0-9_]+$/;
 
 export async function POST(req: Request) {
     try {
+        const resend = new Resend(process.env.RESEND_API_KEY);
         const { email, password, name, username } = await req.json();
 
         if (!email || !password || !name || !username) {

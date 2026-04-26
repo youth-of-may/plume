@@ -12,31 +12,20 @@ export default function Confirm() {
 
   useEffect(() => {
     const supabase = createClient();
+    let handled = false;
 
-    async function ensureProfileForConfirmedUser() {
-      const { data: userData, error } = await supabase.auth.getUser();
-
-      if (error || !userData.user) {
-        setHasError(true);
-        setStatus("Could not verify your confirmation link. Redirecting to sign up...");
-        setTimeout(() => router.replace("/signup"), 1400);
-        return;
-      }
-
-      const { data: sessionData } = await supabase.auth.getSession();
-      const accessToken = sessionData.session?.access_token;
-
+    async function bootstrapConfirmedUser(user: import('@supabase/supabase-js').User, accessToken: string | undefined) {
       const profileResult = await ensureProfileRecord(
         supabase,
-        userData.user,
+        user,
         {
           name:
-            typeof userData.user.user_metadata?.name === "string"
-              ? userData.user.user_metadata.name.trim()
+            typeof user.user_metadata?.name === "string"
+              ? user.user_metadata.name.trim()
               : "",
           username:
-            typeof userData.user.user_metadata?.username === "string"
-              ? userData.user.user_metadata.username.trim()
+            typeof user.user_metadata?.username === "string"
+              ? user.user_metadata.username.trim()
               : "",
           ...(accessToken ? { accessToken } : {}),
         }
@@ -58,15 +47,15 @@ export default function Confirm() {
           const blob = await res.blob();
           const file = new File([blob], fileName, { type });
           const ext = fileName.split('.').pop();
-          const uname = typeof userData.user.user_metadata?.username === 'string'
-            ? userData.user.user_metadata.username.trim()
-            : userData.user.id;
+          const uname = typeof user.user_metadata?.username === 'string'
+            ? user.user_metadata.username.trim()
+            : user.id;
           const path = `${uname}_profile.${ext}`;
           const { data: uploadData, error: uploadError } = await supabase.storage
             .from('profile_pics')
             .upload(path, file, { upsert: true, contentType: type });
           if (!uploadError && uploadData) {
-            await supabase.from('profile').update({ profile_pic_url: uploadData.path }).eq('user_id', userData.user.id);
+            await supabase.from('profile').update({ profile_pic_url: uploadData.path }).eq('user_id', user.id);
           }
           localStorage.removeItem('pending_profile_pic');
         } catch (e) {
@@ -79,7 +68,23 @@ export default function Confirm() {
       setTimeout(() => router.replace("/pet-selection"), 1000);
     }
 
-    ensureProfileForConfirmedUser();
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event: import('@supabase/supabase-js').AuthChangeEvent, session: import('@supabase/supabase-js').Session | null) => {
+      if (handled) return;
+
+      if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session?.user) {
+        handled = true;
+        subscription.unsubscribe();
+        await bootstrapConfirmedUser(session.user, session.access_token);
+      } else if (event === 'INITIAL_SESSION' && !session) {
+        handled = true;
+        subscription.unsubscribe();
+        setHasError(true);
+        setStatus("Could not verify your confirmation link. Redirecting to sign up...");
+        setTimeout(() => router.replace("/signup"), 1400);
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, [router]);
 
   return (

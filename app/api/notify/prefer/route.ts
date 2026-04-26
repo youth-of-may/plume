@@ -7,12 +7,6 @@ import EventReminderEmail from '@/emails/EventReminderEmail';
 import JournalReminderEmail from '@/emails/JournalReminderEmail';
 import { sendInBatches } from '@/utils/emailqueue';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
-
 function shouldSendNow(sendTime: string): boolean {
     const now = new Date().toLocaleTimeString('en-US', {
         timeZone: 'Asia/Manila',
@@ -24,6 +18,11 @@ function shouldSendNow(sendTime: string): boolean {
 }
 
 export async function GET(req: Request) {
+    const resend = new Resend(process.env.RESEND_API_KEY);
+    const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
     const authHeader = req.headers.get('authorization');
     if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
         return Response.json({ error: 'Unauthorized' }, { status: 401 });

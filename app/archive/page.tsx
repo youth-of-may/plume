@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { startOfMonth, endOfMonth } from "date-fns"
 import { createClient } from '@/utils/supabase/server'
 import { getUserArticles } from "./server";

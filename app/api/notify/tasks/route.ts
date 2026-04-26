@@ -4,14 +4,13 @@ import { createClient } from '@supabase/supabase-js';
 import { render } from '@react-email/render';
 import TaskReminderEmail from '@/emails/TaskReminderEmail';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
-
 export async function POST(req: Request) {
   try {
+    const resend = new Resend(process.env.RESEND_API_KEY);
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
     // route checker
     console.log('Tasks route hit');
 

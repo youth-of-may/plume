@@ -23,11 +23,22 @@ export default function JournalForm({ createJournal }: JournalFormProps) {
     await createJournal(formData);
   };
 
+  const validateMood = (e: React.SyntheticEvent<HTMLFormElement>) => {
+    const form = e.currentTarget as HTMLFormElement;
+    const formData = new FormData(form);
+    const mood_id = Number(formData.get("mood_id"));
+
+    if (!mood_id || mood_id <= 0) {
+      e.preventDefault();
+      alert("Please select a mood before saving.");
+    }
+  };
+
   return (
-    <form action={handleSubmit} className="w-full flex flex-col gap-24 items-center mb-12 h-300">
+    <form action={handleSubmit} onSubmit={validateMood} className="w-full flex flex-col gap-24 items-center mb-12 h-300">
 
       {/* Header */}
-      <header className="w-full bg-[#FBF5D1] p-12 relative overflow-visible">
+      <header className="w-full bg-[#FBF5D1] p-12">
         <h1 className="text-center text-[#2E2805] text-6xl font-cherry">
           How are you feeling today?
         </h1>

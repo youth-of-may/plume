@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { createClient } from '@/utils/supabase/server'
 import { cookies } from 'next/headers'
 import TaskListClient from "./tasklistclient"
