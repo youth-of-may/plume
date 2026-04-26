@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 import { ensureProfileRecord } from "@/utils/supabase/ensure-profile";
 
@@ -15,7 +14,6 @@ type Pet = {
 // Root page component where users pick a pet and name it.
 export default function PetSelectionPage() {
   const supabase = useMemo(() => createClient(), []);
-  const router = useRouter();
   const [pets, setPets] = useState<Pet[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedPet, setSelectedPet] = useState<Pet | null>(null);
@@ -135,7 +133,7 @@ export default function PetSelectionPage() {
     setPopupStatus("Pet saved. Redirecting...");
     setSubmitting(false);
     closePetModal();
-    router.push("/");
+    window.location.replace("/");
   }
 
   return (
