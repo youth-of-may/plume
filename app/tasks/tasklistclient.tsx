@@ -106,8 +106,11 @@ export default function TaskListClient({
 }: TaskListClientProps) {
   const supabase = createClient()
   const router = useRouter()
+  const [loadingTaskId, setLoadingTaskId] = useState<number | null>(null)
 
   async function updateTaskStatus(id: number, isComplete: boolean) {
+    if (loadingTaskId !== null) return
+    setLoadingTaskId(id)
     const { data: { user }, error: userError } = await supabase.auth.getUser()
 
     if (userError || !user) return
@@ -163,6 +166,7 @@ export default function TaskListClient({
       .eq("id", id)
       .eq("user_id", user.id)
 
+    setLoadingTaskId(null)
     if (error) return
     router.refresh()
   }
@@ -176,8 +180,10 @@ export default function TaskListClient({
              checked:bg-[#ADD3EA] checked:border-[#ADD3EA]
              checked:before:content-['✔'] checked:before:text-white
              checked:before:flex checked:before:items-center checked:before:justify-center
-             checked:before:text-2xl"
-                checked={mode !== "pending"} onChange={(e) => updateTaskStatus(task.id, e.target.checked)}/>
+             checked:before:text-2xl disabled:opacity-50 disabled:cursor-not-allowed"
+                checked={mode !== "pending"}
+                disabled={loadingTaskId !== null}
+                onChange={(e) => updateTaskStatus(task.id, e.target.checked)}/>
             <div>
               <strong style={{ marginRight: "48px" }}>{task.task_title}</strong>
               {" "}Difficulty: {task.task_difficulty}

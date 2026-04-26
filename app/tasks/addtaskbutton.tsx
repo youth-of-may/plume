@@ -20,14 +20,16 @@ export default function AddTaskButton({ difficulties }: AddTaskButtonProps) {
   const [difficulty, setDifficulty] = useState("")
   const [deadlineDate, setDeadlineDate] = useState("")
   const [deadlineTime, setDeadlineTime] = useState("")
-  const [errorMsg, setErrorMsg] = useState("")  
-  
+  const [errorMsg, setErrorMsg] = useState("")
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
   const supabase = createClient()
   const router = useRouter()
 
   const today = new Date().toISOString().slice(0, 10)
 
   async function handleSubmit() {
+    if (isSubmitting) return
 
     if (!title || !details || !difficulty ||  !deadlineDate || !deadlineTime) {
       setErrorMsg("Please fill in all fields")
@@ -35,6 +37,7 @@ export default function AddTaskButton({ difficulties }: AddTaskButtonProps) {
     }
 
     setErrorMsg("")
+    setIsSubmitting(true)
 
     const deadline = `${deadlineDate}T${deadlineTime}`
     const { data: { user }, error: userError } = await supabase.auth.getUser()
@@ -55,17 +58,17 @@ export default function AddTaskButton({ difficulties }: AddTaskButtonProps) {
 
     if (error) {
       setErrorMsg("Failed to add task: " + error.message)
+      setIsSubmitting(false)
       return
     }
 
-    if (!error) {
-      setIsOpen(false)
-      setTitle("")
-      setDetails("")
-      setDifficulty("")
-      setDeadlineTime("")
-      router.refresh()
-    }
+    setIsOpen(false)
+    setTitle("")
+    setDetails("")
+    setDifficulty("")
+    setDeadlineTime("")
+    setIsSubmitting(false)
+    router.refresh()
   }
 
   return (
@@ -144,9 +147,10 @@ export default function AddTaskButton({ difficulties }: AddTaskButtonProps) {
               </button>
               <button
                 onClick={handleSubmit}
-                className="p-2 px-6 rounded-4xl bg-[#ADD3EA] font-bold"
+                disabled={isSubmitting}
+                className="p-2 px-6 rounded-4xl bg-[#ADD3EA] font-bold disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                Add
+                {isSubmitting ? "Adding..." : "Add"}
               </button>
             </div>
           </div>
