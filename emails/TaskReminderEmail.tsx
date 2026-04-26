@@ -35,8 +35,7 @@ export default function TaskReminderEmail({ userName, tasks }: TaskReminderEmail
                         </Section>
                     ))}
                     <Hr />
-                    {/* Replace with link once deployed */}
-                    <Button href="http://localhost:3000/tasks" style={{
+                    <Button href="https://plume-lyart.vercel.app/tasks" style={{
                         background: '#2563eb', color: '#fff',
                         padding: '12px 24px', borderRadius: 6, textDecoration: 'none'
                     }}>

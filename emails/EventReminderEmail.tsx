@@ -36,7 +36,7 @@ export default function EventReminderEmail({ userName, events }: EventReminderEm
                         </Section>
                     ))}
                     <Hr />
-                    <Button href="http://localhost:3000/calendar" style={{
+                    <Button href="https://plume-lyart.vercel.app/calendar" style={{
                         background: '#2563eb', color: '#fff',
                         padding: '12px 24px', borderRadius: 6, textDecoration: 'none'
                     }}>

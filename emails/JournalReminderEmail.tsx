@@ -32,7 +32,7 @@ export default function JournalReminderEmail({ userName }: JournalReminderEmailP
                     </Section>
 
                     <Hr />
-                    <Button href="http://localhost:3000/journal" style={{
+                    <Button href="https://plume-lyart.vercel.app/journal" style={{
                         background: '#F0B6CF', color: '#2E2805',
                         padding: '12px 24px', borderRadius: 6, textDecoration: 'none',
                         fontWeight: 'bold', marginLeft: 'auto', marginRight: 'auto'
