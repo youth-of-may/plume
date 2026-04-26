@@ -34,11 +34,13 @@ export default function EditTaskButton({ task, difficulties }: EditTaskButtonPro
     task.task_deadline?.split("T")[1]?.slice(0, 5) ?? ""
   )
   const [errorMsg, setErrorMsg] = useState("")
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const supabase = createClient()
   const router = useRouter()
 
   async function handleSubmit(){
+    if (isSubmitting) return
 
     if (!title || !details || !difficulty ||  !deadlineDate || !deadlineTime) {
       setErrorMsg("Please fill in all fields")
@@ -46,6 +48,7 @@ export default function EditTaskButton({ task, difficulties }: EditTaskButtonPro
     }
 
     setErrorMsg("")
+    setIsSubmitting(true)
 
     const deadline = `${deadlineDate}T${deadlineTime}`
     const { data: { user }, error: userError } = await supabase.auth.getUser()
@@ -65,17 +68,17 @@ export default function EditTaskButton({ task, difficulties }: EditTaskButtonPro
 
     if (error) {
       setErrorMsg("Failed to add task: " + error.message)
+      setIsSubmitting(false)
       return
     }
 
-    if (!error) {
-      setIsOpen(false)
-      setTitle("")
-      setDetails("")
-      setDifficulty("")
-      setDeadlineTime("")
-      router.refresh()
-    }   
+    setIsOpen(false)
+    setTitle("")
+    setDetails("")
+    setDifficulty("")
+    setDeadlineTime("")
+    setIsSubmitting(false)
+    router.refresh()
   }
 
   return (
@@ -153,9 +156,10 @@ export default function EditTaskButton({ task, difficulties }: EditTaskButtonPro
               </button>
               <button
                 onClick={handleSubmit}
-                className="p-2 px-7 rounded-4xl bg-[#ADD3EA] font-bold"
+                disabled={isSubmitting}
+                className="p-2 px-7 rounded-4xl bg-[#ADD3EA] font-bold disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                Edit
+                {isSubmitting ? "Saving..." : "Edit"}
               </button>
             </div>
           </div>
