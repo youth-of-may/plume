@@ -68,23 +68,32 @@ export default function Confirm() {
       setTimeout(() => router.replace("/pet-selection"), 1000);
     }
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event: import('@supabase/supabase-js').AuthChangeEvent, session: import('@supabase/supabase-js').Session | null) => {
-      if (handled) return;
-
-      if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session?.user) {
+    // If no SIGNED_IN fires within 10s, the link is invalid/expired.
+    const errorTimeout = setTimeout(() => {
+      if (!handled) {
         handled = true;
-        subscription.unsubscribe();
-        await bootstrapConfirmedUser(session.user, session.access_token);
-      } else if (event === 'INITIAL_SESSION' && !session) {
-        handled = true;
-        subscription.unsubscribe();
         setHasError(true);
         setStatus("Could not verify your confirmation link. Redirecting to sign up...");
         setTimeout(() => router.replace("/signup"), 1400);
       }
+    }, 10000);
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event: import('@supabase/supabase-js').AuthChangeEvent, session: import('@supabase/supabase-js').Session | null) => {
+      if (handled) return;
+
+      if (event === 'SIGNED_IN' && session?.user) {
+        handled = true;
+        clearTimeout(errorTimeout);
+        subscription.unsubscribe();
+        await bootstrapConfirmedUser(session.user, session.access_token);
+      }
+      // INITIAL_SESSION with null fires before the hash is processed — ignore it.
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      clearTimeout(errorTimeout);
+      subscription.unsubscribe();
+    };
   }, [router]);
 
   return (
