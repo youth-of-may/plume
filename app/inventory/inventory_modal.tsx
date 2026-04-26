@@ -16,9 +16,9 @@ type Accessory = {
 };
 
 const rarity: Record<string, { bg: string; text: string; border: string }> = {
-  Common:   { bg: "bg-[#D0E8F7]", text: "text-[#163F55]", border: "border-2 border-[#ADD3EA]" },
-  Rare:     { bg: "bg-[#FFEDF5]", text: "text-[#E37FAA]", border: "border-2 border-[#F0B6CF]" },
-  Epic:     { bg: "bg-yellow-200", text: "text-yellow-800", border: "border-2 border-yellow-400" },
+  Common: { bg: "bg-[#D0E8F7]", text: "text-[#163F55]", border: "border-2 border-[#ADD3EA]" },
+  Rare: { bg: "bg-[#FFEDF5]", text: "text-[#E37FAA]", border: "border-2 border-[#F0B6CF]" },
+  Epic: { bg: "bg-yellow-200", text: "text-yellow-800", border: "border-2 border-yellow-400" },
 };
 
 
@@ -42,10 +42,10 @@ export default function ModalWithTrigger({ acc }: { acc: Accessory }) {
       }
 
       const { data: userData } = await supabase
-    .from("users")
-    .select("exp_points")
-    .eq("id", user.id)
-    .single();
+        .from("users")
+        .select("exp_points")
+        .eq("id", user.id)
+        .single();
 
       const refundExp = Math.floor(acc.accessory_exp / 4);
       const newEXP = user.userEXP + refundExp;
@@ -62,11 +62,11 @@ export default function ModalWithTrigger({ acc }: { acc: Accessory }) {
       }
 
       const { error: updateError } = await supabase
-      .from("users")
-      .update({
-        exp_points: supabase.sql`exp_points + ${refundExp}`,
-      })
-      .eq("id", user.id);
+        .from("users")
+        .update({
+          exp_points: supabase.sql`exp_points + ${refundExp}`,
+        })
+        .eq("id", user.id);
 
       if (updateError) {
         console.error("EXP update failed:", updateError.message);
@@ -82,7 +82,7 @@ export default function ModalWithTrigger({ acc }: { acc: Accessory }) {
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="text-xs px-7 py-2 hover:font-black -translate-y-5"
+        className="px-4 py-2 hover:font-black -translate-y-5"
       >
         Details
       </button>
@@ -119,21 +119,21 @@ export default function ModalWithTrigger({ acc }: { acc: Accessory }) {
               style={{ backgroundColor: "#c08350", color: "#FBF5D1" }}
             >
               ✕
-            </button> 
+            </button>
 
             <div className="text-center mb-6">
               <div className={`inline-block px-4 py-1 rounded-full text-xs font-black uppercase tracking-widest mb-3 
                   ${rarity[acc.accessory_rarity]?.bg} 
                   ${rarity[acc.accessory_rarity]?.text} 
                   ${rarity[acc.accessory_rarity]?.border}`}
-            >
-              {acc.accessory_rarity}
-            </div>
+              >
+                {acc.accessory_rarity}
+              </div>
 
               <h2
                 className="text-3xl font-black font-cherry text-[#2E2805] leading-tight"
               >
-                { acc.accessory_name }
+                {acc.accessory_name}
               </h2>
             </div>
 
@@ -143,7 +143,7 @@ export default function ModalWithTrigger({ acc }: { acc: Accessory }) {
               <div
                 className={`shrink-0 w-32 h-32 rounded-2xl flex items-center justify-center text-4xl border-4 border-[#c08350]
                 ${rarity[acc.accessory_rarity]?.bg} `}
- 
+
               >
                 <Image
                   src={acc.accessory_url}
@@ -201,18 +201,6 @@ export default function ModalWithTrigger({ acc }: { acc: Accessory }) {
                 Close
               </button>
 
-              <button
-                onClick={handleDelete}
-                disabled={isPending}
-                className="px-8 py-3 rounded-xl font-black text-sm uppercase tracking-widest disabled:opacity-50"
-                style={{
-                  backgroundColor: "#c94b4b",
-                  color: "#FBF5D1",
-                  border: "3px solid #8f2f2f",
-                }}
-              >
-                {isPending ? "Deleting..." : "Salvage"}
-              </button>
             </div>
           </div>
 
