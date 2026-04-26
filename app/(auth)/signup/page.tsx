@@ -1,5 +1,4 @@
 "use client"
-import { createClient } from '@/utils/supabase/client';
 import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link';
@@ -13,7 +12,6 @@ export default function Signup() {
     const [username, setUsername] = useState('');
     const [profilePicPreview, setProfilePicPreview] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const supabase = createClient();
     const router = useRouter();
 
     async function checkSignupAvailability(selectedUsername: string, selectedEmailLower: string) {
@@ -106,53 +104,32 @@ export default function Signup() {
             return;
         }
 
-        const { data, error } = await supabase.auth.signUp({
-            email: selectedEmail,
-            password: selectedPassword,
-            options: {
-                emailRedirectTo: `${window.location.origin}/confirm`,
-                data: {
-                    name: selectedName,
-                    username: selectedUsername,
-                },
-            },
+        const res = await fetch('/api/auth/signup', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                email: selectedEmail,
+                password: selectedPassword,
+                name: selectedName,
+                username: selectedUsername,
+            }),
         });
 
-        if (error) {
-            console.error('Sign up error:', error.message, error.code);
-            const msg = error.message.toLowerCase();
-            if (msg.includes("database error saving new user")) {
-                // Re-check availability to give an accurate message
-                const recheck = await checkSignupAvailability(selectedUsername, selectedEmailLower);
-                if (recheck.ok && recheck.emailTaken) {
-                    alert('An account with this email already exists. Please use another email.');
-                } else if (recheck.ok && recheck.usernameTaken) {
-                    alert('Username is already taken. Please choose another one.');
-                } else {
-                    alert('Signup failed. Please try again or contact support.');
-                }
-            } else if (
-                msg.includes("username") ||
-                error.code === '23505'
-            ) {
-                alert('Username is already taken. Please choose another one.');
-            } else if (
-                msg.includes("already registered") ||
-                msg.includes("email")
-            ) {
+        const payload = await res.json().catch(() => null);
+
+        if (!res.ok) {
+            const err = payload?.error ?? 'Signup failed. Please try again.';
+            if (err === 'email_taken') {
                 alert('An account with this email already exists. Please use another email.');
+            } else if (err === 'username_taken') {
+                alert('Username is already taken. Please choose another one.');
             } else {
-                alert(error.message);
+                alert(err);
             }
             return;
         }
 
-        if (data.user) {
-            console.log("Signed up user id:", data.user.id);
-            console.log("Signed up user metadata:", data.user.user_metadata);
-            router.push('/signup/email-sent');
-            console.log('Signup initiated for user:', data.user.id);
-        }
+        router.push('/signup/email-sent');
     }
 
     return (
