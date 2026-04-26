@@ -146,26 +146,28 @@ function FullNav() {
   }
 
   return (
-    <>
-      <button
-        onClick={() => setIsVisible(!isVisible)}
-        className="absolute top-2 left-2 z-50 p-2 rounded-md"
-      >
-        <svg
-          className="size-8 transition-transform duration-300 ease-in-out hover:stroke-[#6B9FBE]"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth="1.5"
-          stroke="currentColor"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-        </svg>
-      </button>
+    <div className={`${isVisible ? "w-[250px]" : "w-auto"} fixed md:sticky left-0 top-0 h-screen overflow-y-auto z-50`}>
+      <div className="flex flex-col bg-[#F7F9FC] shadow-sm border-r-[3px] border-r-[#ADD3EA] min-h-full pt-2 pb-8 gap-5">
+        <div className={`flex ${isVisible ? "justify-end pr-2" : "justify-center"}`}>
+          <button
+            onClick={() => setIsVisible(!isVisible)}
+            className="p-2 rounded-md"
+          >
+            <svg
+              className="size-8 transition-transform duration-300 ease-in-out hover:stroke-[#6B9FBE]"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth="1.5"
+              stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+            </svg>
+          </button>
+        </div>
 
-      {isVisible && (
-        <div className="w-[18%] shrink-0 top-0 overflow-y-auto sticky h-screen">
-          <div className="flex flex-col bg-[#F7F9FC] shadow-sm border-r-15 border-r-[#ADD3EA] pt-8 pb-8 gap-5">
+        {isVisible && (
+          <>
             <div className="flex flex-col items-center font-delius gap-4">
               <img
                 src={dpURL}
@@ -175,7 +177,7 @@ function FullNav() {
                 className="rounded-full border-4 border-[#4F84A5] w-[120px] h-[120px] object-cover"
               />
               <div className="flex flex-col gap-2 items-center">
-                <p className="text-lg font-bold">{username || "user"}</p>
+                <p className="text-lg font-bold truncate max-w-[140px] text-center">{username || "user"}</p>
                 <p className="text-md font-bold rounded-2xl border-2 border-[#4F84A5]">
                   <span className="m-4">EXP: {exp}</span>
                 </p>
@@ -203,10 +205,10 @@ function FullNav() {
                 Log Out
               </button>
             </div>
-          </div>
-        </div>
-      )}
-    </>
+          </>
+        )}
+      </div>
+    </div>
   );
 }
 

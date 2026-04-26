@@ -5,12 +5,15 @@ import { useState } from "react";
 
 export default function ResetShopButton({ userexp }: { userexp: number }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
 
   const canAfford = userexp >= 1000
   const supabase = createClient()
   const router = useRouter()
 
   async function resetShop(){
+    if (isResetting) return
+    setIsResetting(true)
     const { data: { user }, error: userError } = await supabase.auth.getUser()
     if (userError || !user) return
 
@@ -147,8 +150,10 @@ export default function ResetShopButton({ userexp }: { userexp: number }) {
       return
     }
     
+    window.dispatchEvent(new CustomEvent("exp-updated", { detail: { exp: newExp } }))
     setIsOpen(false)
     router.refresh()
+    setIsResetting(false)
   }
 }
 
@@ -200,9 +205,10 @@ export default function ResetShopButton({ userexp }: { userexp: number }) {
               {canAfford && (
                 <button
                   onClick={() => resetShop()}
-                  className="rounded-2xl border-4 border-[#D7B87F] bg-[#F5E8A0] px-5 py-2 font-delius font-bold text-[#2E2805] shadow-sm"
+                  disabled={isResetting}
+                  className="rounded-2xl border-4 border-[#D7B87F] bg-[#F5E8A0] px-5 py-2 font-delius font-bold text-[#2E2805] shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  Confirm Reset
+                  {isResetting ? "Resetting..." : "Confirm Reset"}
                 </button>
               )}
             </div>
