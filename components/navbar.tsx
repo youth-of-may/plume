@@ -146,8 +146,8 @@ function FullNav() {
   }
 
   return (
-    <div className={`${isVisible ? "w-[18%]" : "w-auto"} shrink-0 top-0 sticky h-screen overflow-y-auto`}>
-      <div className="flex flex-col bg-[#F7F9FC] shadow-sm border-r-15 border-r-[#ADD3EA] h-full pt-2 pb-8 gap-5">
+    <div className={`${isVisible ? "w-[250px]" : "w-auto"} fixed md:sticky left-0 top-0 h-screen overflow-y-auto z-50`}>
+      <div className="flex flex-col bg-[#F7F9FC] shadow-sm border-r-[3px] border-r-[#ADD3EA] h-full pt-2 pb-8 gap-5">
         <div className={`flex ${isVisible ? "justify-end pr-2" : "justify-center"}`}>
           <button
             onClick={() => setIsVisible(!isVisible)}
@@ -177,7 +177,7 @@ function FullNav() {
                 className="rounded-full border-4 border-[#4F84A5] w-[120px] h-[120px] object-cover"
               />
               <div className="flex flex-col gap-2 items-center">
-                <p className="text-lg font-bold">{username || "user"}</p>
+                <p className="text-lg font-bold truncate max-w-[140px] text-center">{username || "user"}</p>
                 <p className="text-md font-bold rounded-2xl border-2 border-[#4F84A5]">
                   <span className="m-4">EXP: {exp}</span>
                 </p>
